@@ -1,0 +1,21 @@
+/backend/node_modules/
+
+# Mobile
+/mobile/node_modules/
+
+# Expo
+/mobile/.expo/
+/mobile/dist/
+/mobile/web-build/
+/mobile/expo-env.d.ts
+
+# Native
+/mobile/*.orig.*
+/mobile/*.jks
+/mobile/*.p8
+/mobile/*.p12
+/mobile/*.key
+/mobile/*.mobileprovision
+
+# Metro
+/mobile/.metro-health-check*
