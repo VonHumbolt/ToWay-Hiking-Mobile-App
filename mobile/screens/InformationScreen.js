@@ -1,29 +1,26 @@
 import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
-import WelcomeComponent from '../components/WelcomeComponent';
+import StepWelcomeComponent from '../components/StepWelcomeComponent';
+import StepDiscoverComponent from '../components/StepDiscoverComponent';
+import StepCreateComponent from '../components/StepCreateComponent';
+import StepShareComponent from '../components/StepShareComponent';
 
-const InformationScreen = () => {
+const InformationScreen = ({navigation}) => {
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-background">
        <ProgressSteps>
         <ProgressStep >
-           <WelcomeComponent />
+           <StepWelcomeComponent />
         </ProgressStep>
         <ProgressStep>
-            <View style={{ alignItems: 'center' }}>
-                <Text>This is the content within step 2!</Text>
-            </View>
+            <StepDiscoverComponent />
         </ProgressStep>
         <ProgressStep>
-            <View style={{ alignItems: 'center' }}>
-                <Text>This is the content within step 3!</Text>
-            </View>
+            <StepCreateComponent />
         </ProgressStep>
-        <ProgressStep>
-            <View style={{ alignItems: 'center' }}>
-                <Text>This is the content within step 3!</Text>
-            </View>
+        <ProgressStep navigation={navigation}>
+           <StepShareComponent />
         </ProgressStep>
     </ProgressSteps>
     </SafeAreaView>

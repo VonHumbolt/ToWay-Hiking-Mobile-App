@@ -1,14 +1,14 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
 
-const WelcomeComponent = () => {
+const StepWelcomeComponent = () => {
   return (
     <View className="px-6">
       <Image
         source={require("../assets/openingScreen/welcome.png")}
         className="w-full h-96 self-center"
       />
-      <Text className="text-primary font-extrabold text-4xl uppercase mt-8">
+      <Text className="text-primary font-extrabold text-4xl uppercase mt-16">
         Welcome
       </Text>
       <Text className="text-heading font-bold text-2xl mt-1">
@@ -23,4 +23,4 @@ const WelcomeComponent = () => {
   );
 };
 
-export default WelcomeComponent;
+export default StepWelcomeComponent;

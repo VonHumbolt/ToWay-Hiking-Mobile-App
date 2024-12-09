@@ -61,10 +61,7 @@ const OpeningScreen = ({navigation}) => {
 
   return (
     <View className="flex-1 justify-center items-center bg-primary">
-        <Image source={require("../assets/logo.png")} className="w-fit object-contain"/>
-      {/* <Text className="text-4xl text-heading font-black">
-        Open up App.js to start working on your app!
-      </Text> */}
+        <Image source={require("../assets/logo.png")} className="w-96 h-36"/>
       <Button onPress={() => navigation.navigate("Information")} title="Next" />
     </View>
   );
