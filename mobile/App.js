@@ -8,6 +8,7 @@ import InformationScreen from "./screens/InformationScreen";
 import LoginScreen from "./screens/LoginScreen";
 import CreateAccountScreen from "./screens/CreateAccountScreen";
 import HomeScreen from "./screens/HomeScreen";
+import TabNavigationMainScreen from "./screens/TabNavigationMainScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,13 @@ export default function App() {
           }}
           name="CreateAccount"
           component={CreateAccountScreen}
+        />
+        <Stack.Screen 
+          options={{
+            headerShown: false
+          }}
+          name="TabNavigation"
+          component={TabNavigationMainScreen}
         />
         <Stack.Screen
           options={{
