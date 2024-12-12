@@ -11,9 +11,10 @@ import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import AuthService from "../services/AuthService";
 import { StackActions } from "@react-navigation/native";
+import * as SecureStore from "expo-secure-store";
 
 const CreateAccountScreen = ({ navigation }) => {
-  const authService = new AuthService()
+  const authService = new AuthService();
 
   const {
     control,
@@ -22,16 +23,21 @@ const CreateAccountScreen = ({ navigation }) => {
   } = useForm({});
 
   const onSubmit = (data) => {
-    // authService.register(data)
-    //   .then(res => {
-    //     console.log(res.data)
-    //     // save credentials
-    //     // navigation.navigate("Home")
-    //   })
-    //   .catch((error) => console.log(error))
-    navigation.dispatch(
-      StackActions.replace("TabNavigation")
-    )
+    authService
+      .register(data)
+      .then((res) => {
+        console.log(res.data);
+        console.log(res.status);
+        if (res.status == 200) setUserCredentials(res.data);
+        navigation.dispatch(StackActions.replace("TabNavigation"));
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const setUserCredentials = (data) => {
+    SecureStore.setItemAsync("token", data.token);
+    SecureStore.setItemAsync("userId", data._id);
+    SecureStore.setItemAsync("email", data.email);
   };
 
   return (

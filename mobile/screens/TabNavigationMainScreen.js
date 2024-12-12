@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
 import ProfileScreen from "./ProfileScreen";
+import SavedRouteScreen from "./SavedRouteScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,10 +29,26 @@ const TabNavigationMainScreen = () => {
       <Tab.Screen 
         name="Map"
         component={MapScreen}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            <Image source={require("../assets/icons/map_icon.png")} className="w-12 h-12" />
+        }}
+      />
+      <Tab.Screen 
+        name="SavedRoutes"
+        component={SavedRouteScreen}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            <Image source={require("../assets/icons/saved_icon.png")} className="w-12 h-12" />
+        }}
       />
       <Tab.Screen 
         name="Profile"
         component={ProfileScreen}
+        options={{
+          tabBarIcon: ({ focused }) =>
+            <Image source={require("../assets/icons/profile_icon.png")} className="w-12 h-12" />
+        }}
       />
     </Tab.Navigator>
   );

@@ -9,6 +9,7 @@ import LoginScreen from "./screens/LoginScreen";
 import CreateAccountScreen from "./screens/CreateAccountScreen";
 import HomeScreen from "./screens/HomeScreen";
 import TabNavigationMainScreen from "./screens/TabNavigationMainScreen";
+import TrackingScreen from "./screens/TrackingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,13 @@ export default function App() {
           }}
           name="Home"
           component={HomeScreen}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="Tracking"
+          component={TrackingScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
