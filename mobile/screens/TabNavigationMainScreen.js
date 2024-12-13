@@ -14,8 +14,7 @@ const TabNavigationMainScreen = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: { backgroundColor: '#A5D936', height:75, margin: 20, paddingTop:16, borderRadius: 32 },
-        
+        tabBarStyle: { backgroundColor: '#A5D936', height:75, margin: 20, paddingTop:16, borderRadius: 32, position: "absolute" },
     }}
     >
       <Tab.Screen 

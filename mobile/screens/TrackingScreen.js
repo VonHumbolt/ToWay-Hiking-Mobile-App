@@ -35,17 +35,17 @@ const TrackingScreen = ({ navigation }) => {
       <View className="flex-row items-center justify-between px-6 mt-6 z-10">
         <View className="flex-row">
           <TouchableOpacity
-            className="p-4 w-16 h-16 rounded-full bg-background"
+            className="p-4 w-14 h-14 rounded-full bg-background"
             onPress={() => navigation.goBack()}
           >
-            <FontAwesomeIcon icon={faArrowLeft} size={28} color="#A5D936" />
+            <FontAwesomeIcon icon={faArrowLeft} size={22} color="#A5D936" />
           </TouchableOpacity>
-          <View className="py-4 px-8 bg-background rounded-full ml-4">
-            <Text className="text-xl font-semibold text-body">New Route</Text>
+          <View className="py-3 px-5 bg-background rounded-full ml-4">
+            <Text className="text-lg font-semibold text-body">New Route</Text>
           </View>
         </View>
-        <TouchableOpacity className="p-4 w-16 h-16 rounded-full bg-background">
-          <FontAwesomeIcon icon={faLocationArrow} size={28} color="#A5D936" />
+        <TouchableOpacity className="p-4 w-14 h-14 rounded-full bg-background">
+          <FontAwesomeIcon icon={faLocationArrow} size={22} color="#A5D936" />
         </TouchableOpacity>
       </View>
 

@@ -10,6 +10,7 @@ import CreateAccountScreen from "./screens/CreateAccountScreen";
 import HomeScreen from "./screens/HomeScreen";
 import TabNavigationMainScreen from "./screens/TabNavigationMainScreen";
 import TrackingScreen from "./screens/TrackingScreen";
+import CreateRouteScreen from "./screens/CreateRouteScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +66,13 @@ export default function App() {
           }}
           name="Tracking"
           component={TrackingScreen}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="CreateRoute"
+          component={CreateRouteScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
