@@ -14,39 +14,89 @@ const TabNavigationMainScreen = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: { backgroundColor: '#A5D936', height:75, margin: 20, paddingTop:16, borderRadius: 32, position: "absolute" },
-    }}
+        tabBarStyle: {
+          backgroundColor: "#A5D936",
+          height: 75,
+          margin: 20,
+          paddingTop: 16,
+          borderRadius: 24,
+          position: "absolute",
+        },
+      }}
     >
-      <Tab.Screen 
+      <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-            tabBarIcon: ({ focused }) =>
-              <Image source={require("../assets/icons/homescreen_logo.png")} className="w-9 h-9" />
-          }}
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <Image
+                source={require("../assets/icons/main_icon_active.png")}
+                className="w-14 h-14"
+              />
+            ) : (
+              <Image
+                source={require("../assets/icons/main_icon.png")}
+                className="w-14 h-14"
+              />
+            ),
+        }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="Map"
         component={MapScreen}
         options={{
-          tabBarIcon: ({ focused }) =>
-            <Image source={require("../assets/icons/map_icon.png")} className="w-12 h-12" />
+          tabBarIcon: ({ focused }) => (
+            focused ? (
+              <Image
+                source={require("../assets/icons/map_icon_active.png")}
+                className="w-14 h-14"
+              />
+            ) : (
+              <Image
+                source={require("../assets/icons/map_icon.png")}
+                className="w-14 h-14"
+              />
+            )
+          ),
         }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="SavedRoutes"
         component={SavedRouteScreen}
         options={{
-          tabBarIcon: ({ focused }) =>
-            <Image source={require("../assets/icons/saved_icon.png")} className="w-12 h-12" />
+          tabBarIcon: ({ focused }) => (
+            focused ? (
+              <Image
+                source={require("../assets/icons/saved_icon_active.png")}
+                className="w-14 h-14"
+              />
+            ) : (
+              <Image
+                source={require("../assets/icons/saved_icon.png")}
+                className="w-14 h-14"
+              />
+            )
+          ),
         }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ focused }) =>
-            <Image source={require("../assets/icons/profile_icon.png")} className="w-12 h-12" />
+          tabBarIcon: ({ focused }) => (
+            focused ? (
+              <Image
+                source={require("../assets/icons/profile_icon_active.png")}
+                className="w-14 h-14"
+              />
+            ) : (
+              <Image
+                source={require("../assets/icons/profile_icon.png")}
+                className="w-14 h-14"
+              />
+            )
+          ),
         }}
       />
     </Tab.Navigator>

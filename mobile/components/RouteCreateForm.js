@@ -13,6 +13,7 @@ import {
   faPersonBiking,
   faPersonHiking,
   faPersonRunning,
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 
 const RouteCreateForm = () => {
@@ -50,7 +51,7 @@ const RouteCreateForm = () => {
         <Text className="text-xl font-semibold text-body mt-6 mb-3">
           Add tag
         </Text>
-        <View className="flex-row items-center gap-2">
+        <View className="flex-wrap flex-row items-center gap-2">
           <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
             <FontAwesomeIcon icon={faPersonHiking} size={20} color="white" />
             <Text className="font-regular text-white">Hiking</Text>
@@ -60,12 +61,12 @@ const RouteCreateForm = () => {
             <Text className="font-regular text-[#919191]">Cycling</Text>
           </TouchableOpacity>
           <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
-            <FontAwesomeIcon icon={faPersonBiking} size={20} color="white" />
-            <Text className="font-regular text-white">Mountain Biking</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
             <FontAwesomeIcon icon={faPersonRunning} size={20} color="white" />
             <Text className="font-regular text-white">Running</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
+            <FontAwesomeIcon icon={faPersonBiking} size={20} color="white" />
+            <Text className="font-regular text-white">Mountain Biking</Text>
           </TouchableOpacity>
         </View>
 
@@ -94,8 +95,17 @@ const RouteCreateForm = () => {
         <Text className="text-xl font-semibold text-body mt-6 mb-3">
           Add highlights
         </Text>
-
         <View className="flex-row items-center gap-2">
+          <TextInput
+              placeholder="Highlight - 1"
+              autoCapitalize="words"
+              clearButtonMode="always"
+              className="flex-grow px-4 py-4 border border-secondary rounded-3xl font-regular focus:border-primary focus:border-4"
+            />
+            <FontAwesomeIcon icon={faTrashCan} size={22} color="#919191" />
+        </View>
+
+        <View className="flex-row items-center gap-2 mt-2">
           <Text className="text-xl font-semibold text-body mt-6 mb-3">
             Visibility
           </Text>

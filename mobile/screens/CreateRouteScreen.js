@@ -1,4 +1,11 @@
-import { View, Text, SafeAreaView, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -12,21 +19,16 @@ const CreateRouteScreen = ({ route, navigation }) => {
   const mapRef = useRef();
 
   useEffect(() => {
-    mapRef.current?.animateToRegion({
-      latitude:
-        routeCoordinates[Math.round(routeCoordinates.length / 2)]?.latitude,
-      longitude:
-        routeCoordinates[Math.round(routeCoordinates.length / 2)]?.longitude,
-      latitudeDelta: 0.008,
-      longitudeDelta: 0.008,
-    });
     setStartingPointCoordinate(routeCoordinates[0]);
     setEndPointCoordinate(routeCoordinates[routeCoordinates.length - 1]);
   }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="px-6 mt-4 h-full" automaticallyAdjustKeyboardInsets>
+      <ScrollView
+        className="px-6 mt-4 h-full"
+        automaticallyAdjustKeyboardInsets
+      >
         {/* Route Preview */}
         <Text className="text-xl font-semibold text-body mb-3">
           Route Preview
@@ -37,6 +39,16 @@ const CreateRouteScreen = ({ route, navigation }) => {
               ref={mapRef}
               style={{ flex: 1, borderRadius: 20 }}
               mapType="satellite"
+              initialRegion={{
+                latitude:
+                  routeCoordinates[Math.round(routeCoordinates.length / 2)]
+                    ?.latitude,
+                longitude:
+                  routeCoordinates[Math.round(routeCoordinates.length / 2)]
+                    ?.longitude,
+                latitudeDelta: 0.008,
+                longitudeDelta: 0.008,
+              }}
             >
               <Marker coordinate={startingPointCoordinate}>
                 <Image
@@ -83,12 +95,11 @@ const CreateRouteScreen = ({ route, navigation }) => {
             Add image
           </Text>
           <TouchableOpacity className="w-24 h-24 flex items-center justify-center bg-[#E7E7E7] rounded-2xl">
-            <FontAwesomeIcon icon={faCirclePlus} color="#919191" size={36}/>
+            <FontAwesomeIcon icon={faCirclePlus} color="#919191" size={36} />
           </TouchableOpacity>
 
           {/* Added Images Loop */}
         </View>
-
 
         {/* Form */}
         <RouteCreateForm />
