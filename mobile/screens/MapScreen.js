@@ -75,7 +75,7 @@ const MapScreen = ({ navigation }) => {
       <MapView
         ref={mapRef}
         style={StyleSheet.absoluteFill}
-        mapType="hybridFlyover"
+        mapType="hybrid"
         showsUserLocation
         onLongPress={(e) => {
           drawRoute(e.nativeEvent.coordinate);
@@ -99,7 +99,7 @@ const MapScreen = ({ navigation }) => {
 
         {isStartingPointSelected && (
           <TouchableOpacity
-            className="absolute top-1/3 right-4 p-4 bg-secondaryDark rounded-full"
+            className="absolute top-64 right-4 p-4 bg-secondaryDark rounded-full"
             onPress={takeBackToDrawing}
           >
             <FontAwesomeIcon icon={faRotateLeft} size={20} color="white" />
@@ -107,7 +107,7 @@ const MapScreen = ({ navigation }) => {
         )}
 
         <TouchableOpacity
-          className="absolute top-1/4 right-4 p-4 bg-background rounded-full"
+          className="absolute top-48 right-4 p-4 bg-background rounded-full"
           onPress={() => setIsModalOpen(!isModalOpen)}
         >
           <FontAwesomeIcon icon={faCircleQuestion} size={20} color="#A5D936" />
@@ -141,7 +141,7 @@ const MapScreen = ({ navigation }) => {
 
       {/* Help Modal */}
       {isModalOpen && (
-        <View className="absolute top-1/4 right-20 w-80 p-4 bg-background rounded-xl">
+        <View className="absolute top-52 right-20 w-80 p-4 bg-background rounded-xl">
           <Text className="font-semibold">
             Press on the Map:{" "}
             <Text className="font-regular">

@@ -11,6 +11,7 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import RouteCreateForm from "../components/RouteCreateForm";
+import convertMinuteToHour from "../utils/convertMinuteToHour";
 
 const CreateRouteScreen = ({ route, navigation }) => {
   const { routeCoordinates, distance } = route.params;
@@ -64,25 +65,25 @@ const CreateRouteScreen = ({ route, navigation }) => {
               </Marker>
               <Polyline
                 coordinates={routeCoordinates}
-                strokeColor="blue"
+                strokeColor="#103B5F"
                 strokeWidth={8}
                 lineJoin="bevel"
               />
             </MapView>
           </View>
 
-          <View className="flex-grow gap-y-4">
-            <View className="flex-row items-center justify-between mt-4 gap-x-7 pl-6 pr-8 pb-3 border-b border-b-gray-200">
+          <View className="flex-grow gap-y-4 w-1/2">
+            <View className="flex-row items-center justify-between mt-4 px-4 pb-3 border-b border-b-gray-200">
               <Text className="font-regular text-lg text-body">Distance </Text>
               <Text className="font-semibold text-primary text-xl">
                 {distance} m
               </Text>
             </View>
-            <View className="flex-row items-center justify-between gap-x-7 pl-6 pr-8 pb-3 border-b border-b-gray-200">
+            <View className="flex-row items-center justify-between px-4 pb-3 border-b border-b-gray-200">
               <Text className="font-regular text-lg text-body">Time </Text>
-              <Text className="font-semibold text-primary text-xl">1,2 h</Text>
+              <Text className="font-semibold text-primary text-xl"> {convertMinuteToHour(distance * 60 / 5000)}</Text>
             </View>
-            <View className="flex-row items-center justify-between gap-x-7 pl-6 pr-8 pb-3">
+            <View className="flex-row items-center justify-between px-4 pb-3">
               <Text className="font-regular text-lg text-body">Uphill </Text>
               <Text className="font-semibold text-primary text-xl">229 m</Text>
             </View>

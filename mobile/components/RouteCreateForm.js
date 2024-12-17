@@ -10,11 +10,14 @@ import { useForm, Controller } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faBicycle,
+  faCheck,
+  faChevronDown,
   faPersonBiking,
   faPersonHiking,
   faPersonRunning,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
+import SelectDropdown from "react-native-select-dropdown";
 
 const RouteCreateForm = () => {
   const {
@@ -97,28 +100,53 @@ const RouteCreateForm = () => {
         </Text>
         <View className="flex-row items-center gap-2">
           <TextInput
-              placeholder="Highlight - 1"
-              autoCapitalize="words"
-              clearButtonMode="always"
-              className="flex-grow px-4 py-4 border border-secondary rounded-3xl font-regular focus:border-primary focus:border-4"
-            />
-            <FontAwesomeIcon icon={faTrashCan} size={22} color="#919191" />
+            placeholder="Highlight - 1"
+            autoCapitalize="words"
+            clearButtonMode="always"
+            className="flex-grow px-4 py-4 border border-secondary rounded-3xl font-regular focus:border-primary focus:border-4"
+          />
+          <FontAwesomeIcon icon={faTrashCan} size={22} color="#919191" />
         </View>
 
         <View className="flex-row items-center gap-2 mt-2">
           <Text className="text-xl font-semibold text-body mt-6 mb-3">
             Visibility
           </Text>
-          <TouchableOpacity className="mt-3 px-5 py-3 bg-[#E7E7E7] rounded-full">
-            <Text className="font-regular text-[#919191]">Public</Text>
-          </TouchableOpacity>
+          <SelectDropdown
+            data={["Public", "Private"]}
+            onSelect={(selectedItem, index) => {
+            }}
+            renderButton={(selectedItem, isOpened) => {
+              return (
+                <TouchableOpacity className="flex-row items-center gap-2 mt-3 px-5 py-3 bg-[#E7E7E7] rounded-full">
+                  <Text className="font-regular text-[#919191]">
+                    {(selectedItem && selectedItem) || "Public"}
+                  </Text>
+                  <FontAwesomeIcon icon={faChevronDown} size={12} color="#B5B5B5" />
+                </TouchableOpacity>
+              );
+            }}
+            renderItem={(item, index, isSelected) => {
+              return (
+                <View className="px-5 py-2">
+                  <Text className="font-regular text-lg">{isSelected ? 
+                  <Text> {item} <FontAwesomeIcon icon={faCheck} size={12} /> </Text> 
+                  : item}</Text>
+                </View>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+            dropdownStyle={{borderRadius: 6, width:130, paddingVertical: 8, paddingHorizontal: 2}}
+          />
         </View>
         <Text className="font-regular text-[#919191] text-sm mt-1">
           You can change this setting anytime from route settings.
         </Text>
 
         <TouchableOpacity className="py-3 px-8 rounded-full bg-primary mt-6">
-          <Text className="text-white font-semibold text-lg text-center">Complete</Text>
+          <Text className="text-white font-semibold text-lg text-center">
+            Complete
+          </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </View>
