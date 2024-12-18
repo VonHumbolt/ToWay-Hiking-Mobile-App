@@ -5,7 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -20,6 +20,8 @@ import {
 import SelectDropdown from "react-native-select-dropdown";
 
 const RouteCreateForm = () => {
+  const [categories, setCategories] = useState([]);
+
   const {
     control,
     handleSubmit,
@@ -27,6 +29,18 @@ const RouteCreateForm = () => {
   } = useForm({});
 
   const onSubmit = (data) => {};
+
+  const isElementInCategories = (element) => {
+    if (categories.includes(element)) return true;
+    return false;
+  };
+
+  const addOrRemoveCategory = (category) => {
+    if (isElementInCategories(category)) {
+      const newArr = categories.filter((c) => c != category);
+      setCategories([...newArr]);
+    } else setCategories([...categories, category]);
+  };
 
   return (
     <View>
@@ -55,21 +69,95 @@ const RouteCreateForm = () => {
           Add tag
         </Text>
         <View className="flex-wrap flex-row items-center gap-2">
-          <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
-            <FontAwesomeIcon icon={faPersonHiking} size={20} color="white" />
-            <Text className="font-regular text-white">Hiking</Text>
+          <TouchableOpacity
+            className={`${
+              isElementInCategories("Hiking")
+                ? "bg-primary text-white"
+                : "bg-[#E7E7E7]"
+            }
+            px-5 py-3 flex-row items-center gap-2 rounded-full`}
+            onPress={() => addOrRemoveCategory("Hiking")}
+          >
+            <FontAwesomeIcon
+              icon={faPersonHiking}
+              size={20}
+              color={isElementInCategories("Hiking") ? "white" : "#919191"}
+            />
+            <Text
+              className={`${
+                isElementInCategories("Hiking")
+                  ? "text-white"
+                  : "text-[#919191]"
+              }
+              font-regular`}
+            >
+              Hiking
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-[#E7E7E7] rounded-full">
-            <FontAwesomeIcon icon={faBicycle} size={20} color="#919191" />
-            <Text className="font-regular text-[#919191]">Cycling</Text>
+          <TouchableOpacity
+            className={`${
+              isElementInCategories("Cycling")
+                ? "bg-primary text-white"
+                : "bg-[#E7E7E7]"
+            }
+            px-5 py-3 flex-row items-center gap-2 rounded-full`}
+            onPress={() => addOrRemoveCategory("Cycling")}
+          >
+            <FontAwesomeIcon
+              icon={faBicycle}
+              size={20}
+              color={isElementInCategories("Cycling") ? "white" : "#919191"}
+            />
+            <Text className={`${
+                isElementInCategories("Cycling")
+                  ? "text-white"
+                  : "text-[#919191]"
+              }
+              font-regular`}>Cycling</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
-            <FontAwesomeIcon icon={faPersonRunning} size={20} color="white" />
-            <Text className="font-regular text-white">Running</Text>
+          <TouchableOpacity
+            className={`${
+              isElementInCategories("Running")
+                ? "bg-primary text-white"
+                : "bg-[#E7E7E7]"
+            }
+            px-5 py-3 flex-row items-center gap-2 rounded-full`}
+            onPress={() => addOrRemoveCategory("Running")}
+          >
+            <FontAwesomeIcon
+              icon={faPersonRunning}
+              size={20}
+              color={isElementInCategories("Running") ? "white" : "#919191"}
+            />
+            <Text className={`${
+                isElementInCategories("Running")
+                  ? "text-white"
+                  : "text-[#919191]"
+              }
+              font-regular`}>Running</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="px-5 py-3 flex-row items-center gap-2 bg-primary rounded-full">
-            <FontAwesomeIcon icon={faPersonBiking} size={20} color="white" />
-            <Text className="font-regular text-white">Mountain Biking</Text>
+          <TouchableOpacity
+            className={`${
+              isElementInCategories("Mountain Biking")
+                ? "bg-primary text-white"
+                : "bg-[#E7E7E7]"
+            }
+            px-5 py-3 flex-row items-center gap-2 rounded-full`}
+            onPress={() => addOrRemoveCategory("Mountain Biking")}
+          >
+            <FontAwesomeIcon
+              icon={faPersonBiking}
+              size={20}
+              color={
+                isElementInCategories("Mountain Biking") ? "white" : "#919191"
+              }
+            />
+            <Text className={`${
+                isElementInCategories("Mountain Biking")
+                  ? "text-white"
+                  : "text-[#919191]"
+              }
+              font-regular`}>Mountain Biking</Text>
           </TouchableOpacity>
         </View>
 
@@ -114,29 +202,44 @@ const RouteCreateForm = () => {
           </Text>
           <SelectDropdown
             data={["Public", "Private"]}
-            onSelect={(selectedItem, index) => {
-            }}
+            onSelect={(selectedItem, index) => {}}
             renderButton={(selectedItem, isOpened) => {
               return (
                 <TouchableOpacity className="flex-row items-center gap-2 mt-3 px-5 py-3 bg-[#E7E7E7] rounded-full">
                   <Text className="font-regular text-[#919191]">
                     {(selectedItem && selectedItem) || "Public"}
                   </Text>
-                  <FontAwesomeIcon icon={faChevronDown} size={12} color="#B5B5B5" />
+                  <FontAwesomeIcon
+                    icon={faChevronDown}
+                    size={12}
+                    color="#B5B5B5"
+                  />
                 </TouchableOpacity>
               );
             }}
             renderItem={(item, index, isSelected) => {
               return (
                 <View className="px-5 py-2">
-                  <Text className="font-regular text-lg">{isSelected ? 
-                  <Text> {item} <FontAwesomeIcon icon={faCheck} size={12} /> </Text> 
-                  : item}</Text>
+                  <Text className="font-regular text-lg">
+                    {isSelected ? (
+                      <Text>
+                        {" "}
+                        {item} <FontAwesomeIcon icon={faCheck} size={12} />{" "}
+                      </Text>
+                    ) : (
+                      item
+                    )}
+                  </Text>
                 </View>
               );
             }}
             showsVerticalScrollIndicator={false}
-            dropdownStyle={{borderRadius: 6, width:130, paddingVertical: 8, paddingHorizontal: 2}}
+            dropdownStyle={{
+              borderRadius: 6,
+              width: 130,
+              paddingVertical: 8,
+              paddingHorizontal: 2,
+            }}
           />
         </View>
         <Text className="font-regular text-[#919191] text-sm mt-1">
