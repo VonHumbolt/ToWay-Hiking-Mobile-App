@@ -148,14 +148,16 @@ const CreateRouteScreen = ({ route, navigation }) => {
     for (let i = 0; i < imageFilesForUpload.length; i++) {
       formData.append("images[]", imageFilesForUpload[i]);
     }
-
-    routeService
-      .createRoute(formData)
-      .then((res) => {
-        if(res.status == 200)
-          navigation.navigate("RouteDetail", { routeDetail: res.data })
-      })
-      .catch((err) => console.log(err.message));
+    
+    SecureStore.getItemAsync("token").then(token => {
+      routeService
+        .createRoute(formData, token)
+        .then((res) => {
+          if(res.status == 200)
+            navigation.navigate("RouteDetail", { routeDetail: res.data })
+        })
+        .catch((err) => console.log(err.message));
+    })
   };
 
   const isElementInCategories = (element) => {

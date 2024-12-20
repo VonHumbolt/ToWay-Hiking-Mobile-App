@@ -54,10 +54,11 @@ const createRoute = async (req, res) => {
 const getFiveRoutesWithCityName = async (req, res) => {
   const { cityName } = req.params;
   try {
-    const routes = await Route.find({ city: cityName }).limit(5);
+    const routes = await Route.find({ city: cityName, isPublic: true }).limit(5);
     res.status(200).json(routes);
   } catch (error) {
-    res.stasus(400).json({ error: error.message });
+    console.log(error)
+    res.status(400).json({ error: error.message });
   }
 };
 

@@ -1,4 +1,11 @@
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -11,10 +18,16 @@ import {
 import convertMinuteToHour from "../utils/convertMinuteToHour";
 import UserService from "../services/UserService";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import getPastTimeFromDate from "../utils/getPastTimeFromDate";
+import changeButtonColorWithDifficultyLevel from "../utils/changeButtonColorWithDifficultyLevel";
+import Carousel from "react-native-reanimated-carousel";
+
+const width = Dimensions.get("window").width;
 
 const RouteDetailScreen = ({ route, navigation }) => {
   const { routeDetail } = route.params;
   const [routeOwner, setRouteOwner] = useState();
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const userService = new UserService();
 
   useEffect(() => {
@@ -31,21 +44,41 @@ const RouteDetailScreen = ({ route, navigation }) => {
         console.log(error);
       });
   };
+
   return (
     <View className="flex-1 relative">
+
+
       {/* Slider */}
-      <View>
-        <Image
-          source={{ uri: routeDetail?.images[0] }}
-          className="w-full h-72"
-        />
+      <Carousel
+        width={width}
+        height={288}
+        loop={false}
+        data={routeDetail?.images}
+        onSnapToItem={(index) => setActiveImageIndex(index)}
+        renderItem={({ index, item }) => (
+          <View>
+            <Image source={{ uri: item }} className="w-full h-72" />
+          </View>
+        )}
+      />
+      {/* Dot */}
+      <View className="flex-row items-center gap-2 absolute top-56 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+        {routeDetail?.images.map((image, i) =>
+          activeImageIndex == i ? (
+            <View key={i} className="bg-primary px-3 py-1 rounded-full" />
+          ) : (
+            <View key={i} className="bg-white p-1 rounded-full" />
+          )
+        )}
       </View>
 
-      <ScrollView className="rounded-t-[30px] z-20 bg-background absolute top-64 w-full h-full pt-6">
-
+      <ScrollView className="rounded-t-[30px] z-20 bg-background absolute top-64 bottom-0 w-full pt-6">
         <View className="flex-row items-center justify-between px-6">
           <View>
-            <Text className="font-semibold text-2xl">{routeDetail?.title}</Text>
+            <Text className="font-semibold text-2xl text-wrap w-80">
+              {routeDetail?.title}
+            </Text>
             <Text className="font-regular text-base mt-1">
               {routeDetail?.city}, {routeDetail?.country}
             </Text>
@@ -58,7 +91,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
         {/* Categories */}
         <View className="flex-wrap flex-row items-center gap-2 my-5 px-6">
           {routeDetail?.categories.map((category, index) => (
-            <View key={index} className="px-6 py-3 bg-[#E7E7E7] rounded-full">
+            <View key={index} className="px-5 py-2 bg-[#E7E7E7] rounded-full">
               <Text className="font-regular text-body text-sm">{category}</Text>
             </View>
           ))}
@@ -96,7 +129,11 @@ const RouteDetailScreen = ({ route, navigation }) => {
 
         {/* Difficulty Level */}
         <View className="px-6 py-4 flex-wrap border-b border-[#E7E7E7]">
-          <View className="px-6 py-3 bg-[#73442A] rounded-full">
+          <View
+            className={`${changeButtonColorWithDifficultyLevel(
+              routeDetail?.level
+            )} px-6 py-3 rounded-full`}
+          >
             <Text className="font-regular text-white">
               {routeDetail?.level}
             </Text>
@@ -130,14 +167,14 @@ const RouteDetailScreen = ({ route, navigation }) => {
                     routeOwner?.profilePicture ||
                     "https://res.cloudinary.com/dspea8wm4/image/upload/v1701638455/default_profile_pic_szshsv.jpg",
                 }}
-                className="w-16 h-16 rounded-full"
+                className="w-14 h-14 rounded-full"
               />
               <View>
                 <Text className="font-regular text-base">
                   {routeOwner?.fullName}
                 </Text>
-                <Text className="font-regular text-base">
-                  {routeOwner?.createdAt}
+                <Text className="font-regular text-[#919191] text-sm">
+                  {getPastTimeFromDate(routeOwner?.createdAt)}
                 </Text>
               </View>
             </View>
@@ -149,10 +186,11 @@ const RouteDetailScreen = ({ route, navigation }) => {
         </View>
 
         {/* MapView */}
-        <View className="p-6 w-full h-1/2">
+        <View className="p-6 w-full h-[400px]">
           <MapView
             style={{ flex: 1, borderRadius: 20 }}
             mapType="satellite"
+            pointerEvents="none"
             initialRegion={{
               latitude:
                 routeDetail?.coordinates[
@@ -162,8 +200,8 @@ const RouteDetailScreen = ({ route, navigation }) => {
                 routeDetail?.coordinates[
                   Math.round(routeDetail?.coordinates.length / 2)
                 ]?.longitude,
-              latitudeDelta: 0.008,
-              longitudeDelta: 0.008,
+              latitudeDelta: 0.012,
+              longitudeDelta: 0.012,
             }}
           >
             <Marker coordinate={routeDetail?.coordinates[0]}>
@@ -192,7 +230,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
         </View>
 
         {/* Buttons */}
-        <View className="px-6 gap-y-4 mb-[200px]">
+        <View className="px-6 gap-y-4 pb-14">
           <TouchableOpacity className="px-8 py-4 bg-primary rounded-full">
             <Text className="font-regular text-white text-lg text-center">
               Navigate
@@ -204,8 +242,8 @@ const RouteDetailScreen = ({ route, navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
-
       </ScrollView>
+
 
       <StatusBar style="auto" />
     </View>
