@@ -36,8 +36,9 @@ const CreateAccountScreen = ({ navigation }) => {
 
   const setUserCredentials = (data) => {
     SecureStore.setItemAsync("token", data.token);
-    SecureStore.setItemAsync("userId", data._id);
+    SecureStore.setItemAsync("userId", data.userId);
     SecureStore.setItemAsync("email", data.email);
+    SecureStore.setItemAsync("city", data.city);
   };
 
   return (

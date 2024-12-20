@@ -40,7 +40,12 @@ const userSchema = new Schema({
   profilePicture: {
     type: String,
   },
-});
+  createdRoutes: {
+    type: mongoose.Schema.Types.Array,
+    ref: "Route",
+    default: [],
+  },
+}, {timestamps: true});
 
 userSchema.statics.createAccount = async function (data) {
   if (!validator.isEmail(data.email)) 

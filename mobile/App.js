@@ -11,6 +11,7 @@ import HomeScreen from "./screens/HomeScreen";
 import TabNavigationMainScreen from "./screens/TabNavigationMainScreen";
 import TrackingScreen from "./screens/TrackingScreen";
 import CreateRouteScreen from "./screens/CreateRouteScreen";
+import RouteDetailScreen from "./screens/RouteDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -73,6 +74,13 @@ export default function App() {
           }}
           name="CreateRoute"
           component={CreateRouteScreen}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="RouteDetail"
+          component={RouteDetailScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -20,7 +20,7 @@ const routeSchema = new Schema({
     duration: {
         type: Number
     },
-    destination: {
+    distance: {
         type: Number,
         reuired: true
     },
@@ -36,11 +36,11 @@ const routeSchema = new Schema({
         type: String,
         required: true
     },
-    category: {
+    categories: {
         type: [],
     },
     coordinates: {
-        type: Object,
+        type: [],
         required: true
     },
     images: {
@@ -48,9 +48,10 @@ const routeSchema = new Schema({
     },
     comments: {
         type: mongoose.Schema.Types.Array,
-        ref: "Comment"
+        ref: "Comment",
+        default: []
     },
-    isPublished: {
+    isPublic: {
         type: Boolean,
     },
     importantPoints: {
