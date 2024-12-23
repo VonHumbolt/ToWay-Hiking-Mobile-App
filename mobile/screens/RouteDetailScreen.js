@@ -4,7 +4,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -20,14 +19,12 @@ import UserService from "../services/UserService";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import getPastTimeFromDate from "../utils/getPastTimeFromDate";
 import changeButtonColorWithDifficultyLevel from "../utils/changeButtonColorWithDifficultyLevel";
-import Carousel from "react-native-reanimated-carousel";
+import Slider from "../components/Slider";
 
-const width = Dimensions.get("window").width;
 
 const RouteDetailScreen = ({ route, navigation }) => {
   const { routeDetail } = route.params;
   const [routeOwner, setRouteOwner] = useState();
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const userService = new UserService();
 
   useEffect(() => {
@@ -48,30 +45,8 @@ const RouteDetailScreen = ({ route, navigation }) => {
   return (
     <View className="flex-1 relative">
 
-
-      {/* Slider */}
-      <Carousel
-        width={width}
-        height={288}
-        loop={false}
-        data={routeDetail?.images}
-        onSnapToItem={(index) => setActiveImageIndex(index)}
-        renderItem={({ index, item }) => (
-          <View>
-            <Image source={{ uri: item }} className="w-full h-72" />
-          </View>
-        )}
-      />
-      {/* Dot */}
-      <View className="flex-row items-center gap-2 absolute top-56 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-        {routeDetail?.images.map((image, i) =>
-          activeImageIndex == i ? (
-            <View key={i} className="bg-primary px-3 py-1 rounded-full" />
-          ) : (
-            <View key={i} className="bg-white p-1 rounded-full" />
-          )
-        )}
-      </View>
+      {/* Image Slider */}
+      <Slider data={routeDetail?.images} />
 
       <ScrollView className="rounded-t-[30px] z-20 bg-background absolute top-64 bottom-0 w-full pt-6">
         <View className="flex-row items-center justify-between px-6">
