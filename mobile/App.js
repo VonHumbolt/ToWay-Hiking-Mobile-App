@@ -12,6 +12,7 @@ import TabNavigationMainScreen from "./screens/TabNavigationMainScreen";
 import TrackingScreen from "./screens/TrackingScreen";
 import CreateRouteScreen from "./screens/CreateRouteScreen";
 import RouteDetailScreen from "./screens/RouteDetailScreen";
+import SignInScreen from "./screens/SignInScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,13 @@ export default function App() {
           }}
           name="CreateAccount"
           component={CreateAccountScreen}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="SignIn"
+          component={SignInScreen}
         />
         <Stack.Screen 
           options={{

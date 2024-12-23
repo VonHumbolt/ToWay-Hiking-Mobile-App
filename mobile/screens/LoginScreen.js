@@ -34,7 +34,7 @@ const LoginScreen = ({navigation}) => {
           </Text>
         </TouchableOpacity>
 
-        <Text className="mt-8 text-xl text-secondary underline text-center font-semibold">
+        <Text className="mt-8 text-xl text-secondary underline text-center font-semibold" onPress={() => navigation.navigate("SignIn")}>
           Sign in
         </Text>
         <Text className="mt-8 text-base text-gray-500 text-center font-regular">

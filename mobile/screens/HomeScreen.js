@@ -12,6 +12,7 @@ const HomeScreen = () => {
     // SecureStore.deleteItemAsync("userId")
     // SecureStore.deleteItemAsync("email")
     // SecureStore.deleteItemAsync("token")
+    // SecureStore.deleteItemAsync("city")
   }, [])
 
   return (

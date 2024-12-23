@@ -8,4 +8,8 @@ export default class AuthService {
     register(data) {
         return axios.post(this.apiUrl + "register", data)
     }
+   
+    login(data) {
+        return axios.post(this.apiUrl + "login", data)
+    }
 }

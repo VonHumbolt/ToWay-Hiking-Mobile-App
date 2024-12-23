@@ -1,9 +1,11 @@
 const express  = require("express")
 
-const {createAccount, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes} = require("../controllers/userController")
+const {createAccount, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes, login} = require("../controllers/userController")
 const requireAuth = require("../middleware/requireAuth")
 
 const router = express.Router()
+
+router.post("/login", login)
 
 router.post("/register", createAccount)
 

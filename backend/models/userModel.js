@@ -69,4 +69,20 @@ userSchema.statics.createAccount = async function (data) {
   return user
 };
 
+userSchema.statics.login = async function (email, password) {
+  if (!email || !password) 
+      throw Error("Email and password must not be null!")
+
+  const user = await this.findOne({email});
+
+  if(!user)
+      throw Error("Incorrect email")
+
+  const match = await bcrypt.compare(password, user.password)
+  if(!match)
+      throw Error("Incorrect password")
+
+  return user
+}
+
 module.exports = mongoose.model("User", userSchema);
