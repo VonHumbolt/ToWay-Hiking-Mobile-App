@@ -37,7 +37,9 @@ const Slider = ({ data }) => {
           <SliderItem key={index} item={item} index={index} scrollX={scrollX} />
         )}
         keyExtractor={(_, index) => {
-          index;
+          return (
+            index
+          )
         }}
         horizontal
         showsHorizontalScrollIndicator={false}

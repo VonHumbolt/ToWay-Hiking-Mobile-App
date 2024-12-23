@@ -57,4 +57,87 @@ const addCreatedRoute = async (route) => {
   }
 };
 
-module.exports = { createAccount, addCreatedRoute, getUserById };
+const isRouteInUserSavedRoutes = async (req,res) => {
+  const { routeId, userId } = req.params;
+  try {
+    const user = await User.findById({ _id: userId });
+    if (!user)
+      res.status(404).json({ error: "User was not found with given ID" });
+
+    if(user.savedRoutes.includes(routeId)){
+      res.status(200).json({
+        isSaved: true
+      });
+    } else {
+      res.status(200).json({
+        isSaved: false
+      });
+    }
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+const saveRouteForUser = async (req, res) => {
+  const { routeId, userId } = req.params;
+
+  try {
+    const user = await User.findById({ _id: userId });
+    if (!user)
+      res.status(404).json({ error: "User was not found with given ID" });
+
+    if(!user.savedRoutes.includes(routeId)){
+      user.savedRoutes.push(routeId)
+    }
+   
+    await User.findByIdAndUpdate(
+      { _id: userId },
+      { savedRoutes: user.savedRoutes }
+    );
+
+    res
+      .status(200)
+      .json({
+        userId: userId,
+        routeId: routeId,
+        isSaved: true,
+      });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const removeRouteFromUserSavedRoutes = async (req, res) => {
+  const { routeId, userId } = req.params;
+
+  try {
+    const user = await User.findById({ _id: userId });
+    if (!user)
+      res.status(404).json({ error: "User was not found with given ID" });
+
+    if(user.savedRoutes.includes(routeId)){
+      const newRoutes = user.savedRoutes.filter(r => r != routeId)
+
+      await User.findByIdAndUpdate(
+        { _id: userId },
+        { savedRoutes: newRoutes }
+      );
+  
+      res
+        .status(200)
+        .json({
+          userId: userId,
+          routeId: routeId,
+          isSaved: false,
+        });
+    } else {
+      res.status(400).json({message: "Route is not saved!"})
+    }
+   
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { createAccount, addCreatedRoute, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes };

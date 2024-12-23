@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -18,17 +12,18 @@ import convertMinuteToHour from "../utils/convertMinuteToHour";
 import UserService from "../services/UserService";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import getPastTimeFromDate from "../utils/getPastTimeFromDate";
-import changeButtonColorWithDifficultyLevel from "../utils/changeButtonColorWithDifficultyLevel";
 import Slider from "../components/Slider";
-
+import * as SecureStore from "expo-secure-store";
 
 const RouteDetailScreen = ({ route, navigation }) => {
   const { routeDetail } = route.params;
   const [routeOwner, setRouteOwner] = useState();
+  const [isRouteSaved, setIsRouteSaved] = useState(false);
   const userService = new UserService();
 
   useEffect(() => {
     getOwnerOfRoute();
+    isRouteSavedInUserRoutes();
   }, []);
 
   const getOwnerOfRoute = () => {
@@ -42,9 +37,62 @@ const RouteDetailScreen = ({ route, navigation }) => {
       });
   };
 
+  const isRouteSavedInUserRoutes = () => {
+    SecureStore.getItemAsync("token").then((token) => {
+      SecureStore.getItemAsync("userId").then((userId) => {
+        userService
+          .isRouteSaved(routeDetail?._id, userId, token)
+          .then((res) => {
+            if (res.status == 200) setIsRouteSaved(res.data.isSaved);
+          });
+      });
+    });
+  };
+
+  function changeButtonColorWithDifficultyLevel() {
+    switch (routeDetail?.level) {
+      case "Beginner":
+        return "bg-secondary";
+      case "Intermediate":
+        return "bg-[#73442A]";
+      case "Hard":
+        return "bg-[#852221]";
+      case "Extreme":
+        return "bg-[#4B0404]";
+    }
+  }
+
+  const saveRoute = () => {
+    SecureStore.getItemAsync("token").then((token) => {
+      SecureStore.getItemAsync("userId").then((userId) => {
+        userService
+          .saveRouteForUser(routeDetail?._id, userId, token)
+          .then((res) => {
+            if (res.status == 200) setIsRouteSaved(true);
+          });
+      });
+    });
+  };
+
+  const removeFromSavedRoutes = () => {
+    SecureStore.getItemAsync("token").then((token) => {
+      SecureStore.getItemAsync("userId").then((userId) => {
+        userService
+          .removeRouteFromUserSavedRoutes(routeDetail?._id, userId, token)
+          .then((res) => {
+            if (res.status == 200) setIsRouteSaved(false);
+          });
+      });
+    });
+  };
+
+  const handleSaveRouteButton = () => {
+    if (isRouteSaved) removeFromSavedRoutes();
+    else saveRoute();
+  };
+
   return (
     <View className="flex-1 relative">
-
       {/* Image Slider */}
       <Slider data={routeDetail?.images} />
 
@@ -58,8 +106,19 @@ const RouteDetailScreen = ({ route, navigation }) => {
               {routeDetail?.city}, {routeDetail?.country}
             </Text>
           </View>
-          <TouchableOpacity className="p-4 bg-primary rounded-full">
-            <FontAwesomeIcon icon={faBookmarkRegular} size={22} color="white" />
+          <TouchableOpacity
+            className="p-4 bg-primary rounded-full"
+            onPress={handleSaveRouteButton}
+          >
+            {isRouteSaved ? (
+              <FontAwesomeIcon icon={faBookmarkSolid} size={22} color="white" />
+            ) : (
+              <FontAwesomeIcon
+                icon={faBookmarkRegular}
+                size={22}
+                color="white"
+              />
+            )}
           </TouchableOpacity>
         </View>
 
@@ -103,16 +162,18 @@ const RouteDetailScreen = ({ route, navigation }) => {
         </View>
 
         {/* Difficulty Level */}
-        <View className="px-6 py-4 flex-wrap border-b border-[#E7E7E7]">
-          <View
-            className={`${changeButtonColorWithDifficultyLevel(
-              routeDetail?.level
-            )} px-6 py-3 rounded-full`}
-          >
-            <Text className="font-regular text-white">
-              {routeDetail?.level}
-            </Text>
-          </View>
+        <View className="flex-row justify-between items-center px-6 py-4 flex-wrap border-b border-[#E7E7E7]">
+            <View
+              className={`${changeButtonColorWithDifficultyLevel()} px-6 py-3 rounded-full`}
+            >
+              <Text className="font-regular text-white">
+                {routeDetail?.level}
+              </Text>
+            </View>
+
+          <Text className="font-regular text-[#919191] text-sm">
+              Created {getPastTimeFromDate(routeDetail?.createdAt)}
+          </Text>
         </View>
 
         {/* Description */}
@@ -206,7 +267,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
 
         {/* Buttons */}
         <View className="px-6 gap-y-4 pb-14">
-          <TouchableOpacity className="px-8 py-4 bg-primary rounded-full">
+          <TouchableOpacity className="px-8 py-4 bg-primary rounded-full" onPress={() => navigation.navigate("Tracking", { routeDetail: routeDetail })}>
             <Text className="font-regular text-white text-lg text-center">
               Navigate
             </Text>
@@ -218,7 +279,6 @@ const RouteDetailScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
 
       <StatusBar style="auto" />
     </View>

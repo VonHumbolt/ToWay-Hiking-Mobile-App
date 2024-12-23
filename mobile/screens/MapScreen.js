@@ -132,7 +132,7 @@ const MapScreen = ({ navigation }) => {
 
       <TouchableOpacity
         className="absolute bottom-32 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-2 py-3 px-4 rounded-3xl bg-secondaryDark z-10"
-        onPress={() => navigation.navigate("Tracking")}
+        onPress={() => navigation.navigate("Tracking", {routeDetail: null})}
       >
         <Text className="text-white font-semibold text-lg">
           Start Without Route
