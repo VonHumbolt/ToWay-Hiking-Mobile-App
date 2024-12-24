@@ -4,7 +4,7 @@ import React from 'react'
 const SliderItem = ({item}) => {
   return (
     <View className="w-screen">
-      <Image source={{uri: item}} className="w-full h-72" />
+      <Image source={{uri: item}} className="w-full h-96" />
     </View>
   )
 }

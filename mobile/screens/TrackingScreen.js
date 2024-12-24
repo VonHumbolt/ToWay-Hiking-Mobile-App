@@ -9,17 +9,19 @@ import {
   faLocationArrow,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import StartedRoutesService from "../services/StartedRoutesService";
+import * as SecureStore from "expo-secure-store";
+import { getPathLength } from "geolib";
+import StopWatch from "../components/StopWatch";
 
 const TrackingScreen = ({ route, navigation }) => {
-  const { routeDetail } = route.params;
+  const { routeDetail, startedRouteId } = route.params;
   const mapRef = useRef();
+  const startedRoutesService = new StartedRoutesService();
 
-  // const [time, setTime] = useState(0);
-  // const [isRunning, setIsRunning] = useState(true);
-  // const hours = Math.floor(time / 360000);
-  // const minutes = Math.floor((time % 360000) / 6000);
-  // const seconds = Math.floor((time % 6000) / 100);
-
+  const [userCoordinates, setUserCoordinates] = useState([]);
+  const [isStopWatchRunning, setIsStopWatchRunning] = useState(true)
+  
   const getLocation = async () => {
     const location = await Location.getCurrentPositionAsync({
       // enableHighAccurancy: true
@@ -35,18 +37,7 @@ const TrackingScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     getLocation();
-    // let intervalId;
-    // if (isRunning) {
-    //   intervalId = setInterval(() => setTime(time + 1), 10);
-    // }
-    // return () => clearInterval(intervalId);
-   
-  
   }, []);
-
-  const stopTimer = () => {
-    setIsRunning(false);
-  };
 
   const zoomToUser = async () => {
     const location = await Location.getCurrentPositionAsync({});
@@ -57,6 +48,27 @@ const TrackingScreen = ({ route, navigation }) => {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
+  };
+
+  const drawUserLocation = (coords) => {
+    setUserCoordinates([...userCoordinates, coords]);
+  };
+
+  const updateTrackingRoute = () => {
+    const distance = getPathLength(userCoordinates);
+    SecureStore.getItemAsync("token").then((token) => {
+      startedRoutesService.updateTracking({
+        id: startedRouteId, 
+        userCoordinates: userCoordinates,
+        distance: distance,
+      }, token).then(res => {
+        console.log(res.data)
+      })
+    });
+  };
+
+  const stopOrStartTracking = () => {
+    setIsStopWatchRunning(!isStopWatchRunning)
   }
 
   return (
@@ -69,13 +81,16 @@ const TrackingScreen = ({ route, navigation }) => {
           >
             <FontAwesomeIcon icon={faArrowLeft} size={22} color="#A5D936" />
           </TouchableOpacity>
-          <View className="py-3 px-5 bg-background rounded-full ml-4 max-w-72">
+          <View className="py-3 px-5 bg-background rounded-full ml-4 max-w-72 justify-center">
             <Text className="text-lg font-semibold text-body line-clamp-2">
               {routeDetail ? routeDetail?.title : "New Route"}
             </Text>
           </View>
         </View>
-        <TouchableOpacity className="p-4 w-14 h-14 rounded-full bg-background" onPress={zoomToUser}>
+        <TouchableOpacity
+          className="p-4 w-14 h-14 rounded-full bg-background"
+          onPress={zoomToUser}
+        >
           <FontAwesomeIcon icon={faLocationArrow} size={22} color="#A5D936" />
         </TouchableOpacity>
       </View>
@@ -85,13 +100,22 @@ const TrackingScreen = ({ route, navigation }) => {
         style={StyleSheet.absoluteFill}
         mapType="satellite"
         showsUserLocation
+        followsUserLocation
+        userLocationUpdateInterval={3000}
+        onUserLocationChange={(e) => drawUserLocation(e.nativeEvent.coordinate)}
       >
+        <Polyline
+          coordinates={userCoordinates}
+          strokeColor="#0396FF"
+          strokeWidth={10}
+          lineJoin="bevel"
+        />
         {routeDetail && (
           <View>
             <Marker coordinate={routeDetail?.coordinates[0]}>
               <Image
                 source={require("../assets/icons/start_icon.png")}
-                className="w-10 h-10"
+                className="w-12 h-12"
               />
             </Marker>
             <Marker
@@ -101,12 +125,12 @@ const TrackingScreen = ({ route, navigation }) => {
             >
               <Image
                 source={require("../assets/icons/finish_icon.png")}
-                className="w-10 h-10"
+                className="w-12 h-12"
               />
             </Marker>
             <Polyline
               coordinates={routeDetail?.coordinates}
-              strokeColor="#103B5F"
+              strokeColor="#E16308"
               strokeWidth={12}
               lineJoin="bevel"
             />
@@ -136,15 +160,12 @@ const TrackingScreen = ({ route, navigation }) => {
               <Text className="text-base font-regular text-gray-500">km</Text>
             </Text>
           </View>
-          <View className="flex-row items-center gap-1">
+          <View className="flex-row items-center">
             <Image
               source={require("../assets/icons/time_icon.png")}
               className="w-8 h-8"
             />
-            <Text className="font-semibold text-2xl">
-           19
-              <Text className="text-base font-regular text-gray-500">min</Text>
-            </Text>
+              <StopWatch isStopWatchRunning={isStopWatchRunning} />
           </View>
           <View className="flex-row items-center gap-1">
             <Image
@@ -161,8 +182,11 @@ const TrackingScreen = ({ route, navigation }) => {
         <View className="border border-gray-200 my-6" />
 
         <View className="flex-row gap-6 pb-4">
-          <TouchableOpacity className="py-3 px-8 rounded-full bg-secondaryDark" onPress={stopTimer}>
-            <Text className="text-white font-semibold text-lg">Stop</Text>
+          <TouchableOpacity
+            className={`py-3 px-8 rounded-full ${isStopWatchRunning ? "bg-secondaryDark" : "bg-secondary"}`}
+            onPress={stopOrStartTracking}
+          >
+            <Text className="text-white font-semibold text-lg">{isStopWatchRunning ? "Stop" : "Start"}</Text>
           </TouchableOpacity>
           <TouchableOpacity className="py-3 px-8 rounded-full bg-primary">
             <Text className="text-white font-semibold text-lg">

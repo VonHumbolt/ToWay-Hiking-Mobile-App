@@ -14,12 +14,14 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import getPastTimeFromDate from "../utils/getPastTimeFromDate";
 import Slider from "../components/Slider";
 import * as SecureStore from "expo-secure-store";
+import StartedRoutesService from "../services/StartedRoutesService";
 
 const RouteDetailScreen = ({ route, navigation }) => {
   const { routeDetail } = route.params;
   const [routeOwner, setRouteOwner] = useState();
   const [isRouteSaved, setIsRouteSaved] = useState(false);
   const userService = new UserService();
+  const startedRoutesService = new StartedRoutesService();
 
   useEffect(() => {
     getOwnerOfRoute();
@@ -91,12 +93,30 @@ const RouteDetailScreen = ({ route, navigation }) => {
     else saveRoute();
   };
 
+  const startTracking = () => {
+    SecureStore.getItemAsync("token").then((token) => {
+      SecureStore.getItemAsync("userId").then((userId) => {
+        startedRoutesService
+          .startTracking({
+            userId,
+            routeId: routeDetail._id,
+            userCoordinates: [],
+          }, token)
+          .then((res) => {
+            console.log(res.data);
+            if (res.status == 200)
+              navigation.navigate("Tracking", { routeDetail: routeDetail, startedRouteId: res.data.id })
+          });
+      });
+    });
+  };
+
   return (
     <View className="flex-1 relative">
       {/* Image Slider */}
       <Slider data={routeDetail?.images} />
 
-      <ScrollView className="rounded-t-[30px] z-20 bg-background absolute top-64 bottom-0 w-full pt-6">
+      <ScrollView className="rounded-t-[30px] z-20 bg-background absolute top-80 bottom-0 w-full pt-6">
         <View className="flex-row items-center justify-between px-6">
           <View>
             <Text className="font-semibold text-2xl text-wrap w-80">
@@ -163,16 +183,16 @@ const RouteDetailScreen = ({ route, navigation }) => {
 
         {/* Difficulty Level */}
         <View className="flex-row justify-between items-center px-6 py-4 flex-wrap border-b border-[#E7E7E7]">
-            <View
-              className={`${changeButtonColorWithDifficultyLevel()} px-6 py-3 rounded-full`}
-            >
-              <Text className="font-regular text-white">
-                {routeDetail?.level}
-              </Text>
-            </View>
+          <View
+            className={`${changeButtonColorWithDifficultyLevel()} px-6 py-3 rounded-full`}
+          >
+            <Text className="font-regular text-white">
+              {routeDetail?.level}
+            </Text>
+          </View>
 
           <Text className="font-regular text-[#919191] text-sm">
-              Created {getPastTimeFromDate(routeDetail?.createdAt)}
+            Created {getPastTimeFromDate(routeDetail?.createdAt)}
           </Text>
         </View>
 
@@ -258,7 +278,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
             </Marker>
             <Polyline
               coordinates={routeDetail?.coordinates}
-              strokeColor="#103B5F"
+              strokeColor="#E16308"
               strokeWidth={8}
               lineJoin="bevel"
             />
@@ -267,7 +287,10 @@ const RouteDetailScreen = ({ route, navigation }) => {
 
         {/* Buttons */}
         <View className="px-6 gap-y-4 pb-14">
-          <TouchableOpacity className="px-8 py-4 bg-primary rounded-full" onPress={() => navigation.navigate("Tracking", { routeDetail: routeDetail })}>
+          <TouchableOpacity
+            className="px-8 py-4 bg-primary rounded-full"
+            onPress={startTracking}
+          >
             <Text className="font-regular text-white text-lg text-center">
               Navigate
             </Text>

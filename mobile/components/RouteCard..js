@@ -35,6 +35,35 @@ const RouteCard = ({ route }) => {
     });
   };
 
+  const saveRoute = () => {
+      SecureStore.getItemAsync("token").then((token) => {
+        SecureStore.getItemAsync("userId").then((userId) => {
+          userService
+            .saveRouteForUser(route?._id, userId, token)
+            .then((res) => {
+              if (res.status == 200) setIsRouteSaved(true);
+            });
+        });
+      });
+    };
+  
+    const removeFromSavedRoutes = () => {
+      SecureStore.getItemAsync("token").then((token) => {
+        SecureStore.getItemAsync("userId").then((userId) => {
+          userService
+            .removeRouteFromUserSavedRoutes(route?._id, userId, token)
+            .then((res) => {
+              if (res.status == 200) setIsRouteSaved(false);
+            });
+        });
+      });
+    };
+
+    const handleSaveRouteButton = () => {
+      if (isRouteSaved) removeFromSavedRoutes();
+      else saveRoute();
+    };
+
   const averageSpeed = () => {
     const km = route?.distance / 1000;
     const hour = route?.duration / 60;
@@ -61,7 +90,8 @@ const RouteCard = ({ route }) => {
       onPress={() => navigation.navigate("RouteDetail", { routeDetail: route })}
     >
       {/* Save Icon */}
-      <TouchableOpacity className="absolute right-0 top-0 p-4 bg-primary z-10 rounded-tr-3xl rounded-bl-3xl">
+      <TouchableOpacity className="absolute right-0 top-0 p-4 bg-primary z-10 rounded-tr-3xl rounded-bl-3xl"
+      onPress={handleSaveRouteButton}>
         {isRouteSaved ? (
           <FontAwesomeIcon icon={faBookmarkSolid} size={20} color="white" />
         ) : (

@@ -25,6 +25,7 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.login(email, password);
+    console.log(user)
     const token = await generateToken(user._id);
     res.status(200).json({
       userId: user._id,

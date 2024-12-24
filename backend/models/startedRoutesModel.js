@@ -26,7 +26,9 @@ const startedRoutesSchema = new Schema({
     duration: {
         type: Number,
     },
-    destination: {
+    distance: {
         type: Number
     }
 })
+
+module.exports = mongoose.model("StartedRoutes", startedRoutesSchema)

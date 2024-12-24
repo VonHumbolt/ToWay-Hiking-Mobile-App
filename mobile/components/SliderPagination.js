@@ -5,7 +5,7 @@ const { width } = Dimensions.get("screen");
 
 const SliderPagination = ({ items, scrollX, paginationIndex }) => {
   return (
-    <View className="absolute bottom-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+    <View className="absolute bottom-20 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
       <View className="flex-row justify-center items-center gap-2">
         {items.map((_, index) => {
           const inputRange = [
