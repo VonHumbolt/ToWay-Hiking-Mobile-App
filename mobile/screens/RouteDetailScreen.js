@@ -15,6 +15,7 @@ import getPastTimeFromDate from "../utils/getPastTimeFromDate";
 import Slider from "../components/Slider";
 import * as SecureStore from "expo-secure-store";
 import StartedRoutesService from "../services/StartedRoutesService";
+import { useTrackingStore } from "../store";
 
 const RouteDetailScreen = ({ route, navigation }) => {
   const { routeDetail } = route.params;
@@ -22,6 +23,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
   const [isRouteSaved, setIsRouteSaved] = useState(false);
   const userService = new UserService();
   const startedRoutesService = new StartedRoutesService();
+  const { tracking, startOrUpdateTracking } = useTrackingStore();
 
   useEffect(() => {
     getOwnerOfRoute();
@@ -93,7 +95,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
     else saveRoute();
   };
 
-  const startTracking = () => {
+  const startTrackingTheRoute = () => {
     SecureStore.getItemAsync("token").then((token) => {
       SecureStore.getItemAsync("userId").then((userId) => {
         startedRoutesService
@@ -104,8 +106,17 @@ const RouteDetailScreen = ({ route, navigation }) => {
           }, token)
           .then((res) => {
             console.log(res.data);
-            if (res.status == 200)
+            if (res.status == 200) {
+              const tracking = {
+                id: res.data.id,
+                title: routeDetail.title,
+                distance: 0,
+                time: 0,
+                isTrackingActive: true,
+              }
+              startOrUpdateTracking(tracking)
               navigation.navigate("Tracking", { routeDetail: routeDetail, startedRouteId: res.data.id })
+            }
           });
       });
     });
@@ -289,7 +300,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
         <View className="px-6 gap-y-4 pb-14">
           <TouchableOpacity
             className="px-8 py-4 bg-primary rounded-full"
-            onPress={startTracking}
+            onPress={startTrackingTheRoute}
           >
             <Text className="font-regular text-white text-lg text-center">
               Navigate

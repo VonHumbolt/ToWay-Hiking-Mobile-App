@@ -5,18 +5,20 @@ import { faFilter, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import * as SecureStore from "expo-secure-store";
 import PersonalizedRoutes from "../components/PersonalizedRoutes";
 import PopularRoutes from "../components/PopularRoutes";
+import MiniTrackingBar from "../components/MiniTrackingBar";
+import { useTrackingStore } from "../store";
 
 const HomeScreen = () => {
-
+  const { tracking } = useTrackingStore();
   useEffect(() => {
     // SecureStore.deleteItemAsync("userId")
     // SecureStore.deleteItemAsync("email")
     // SecureStore.deleteItemAsync("token")
     // SecureStore.deleteItemAsync("city")
-  }, [])
+  }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-background mb-28">
+    <SafeAreaView className="flex-1 relative bg-background mb-28">
       <ScrollView className="px-6 mt-4">
         <View className="flex flex-row items-center gap-2 relative">
           <View className="absolute top-4 left-3 z-10">
@@ -34,6 +36,7 @@ const HomeScreen = () => {
 
         <PersonalizedRoutes />
       </ScrollView>
+      {tracking && <MiniTrackingBar />}
     </SafeAreaView>
   );
 };

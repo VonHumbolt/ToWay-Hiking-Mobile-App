@@ -20,8 +20,8 @@ const TrackingScreen = ({ route, navigation }) => {
   const startedRoutesService = new StartedRoutesService();
 
   const [userCoordinates, setUserCoordinates] = useState([]);
-  const [isStopWatchRunning, setIsStopWatchRunning] = useState(true)
-  
+  const [isStopWatchRunning, setIsStopWatchRunning] = useState(true);
+
   const getLocation = async () => {
     const location = await Location.getCurrentPositionAsync({
       // enableHighAccurancy: true
@@ -57,19 +57,24 @@ const TrackingScreen = ({ route, navigation }) => {
   const updateTrackingRoute = () => {
     const distance = getPathLength(userCoordinates);
     SecureStore.getItemAsync("token").then((token) => {
-      startedRoutesService.updateTracking({
-        id: startedRouteId, 
-        userCoordinates: userCoordinates,
-        distance: distance,
-      }, token).then(res => {
-        console.log(res.data)
-      })
+      startedRoutesService
+        .updateTracking(
+          {
+            id: startedRouteId,
+            userCoordinates: userCoordinates,
+            distance: distance,
+          },
+          token
+        )
+        .then((res) => {
+          console.log(res.data);
+        });
     });
   };
 
   const stopOrStartTracking = () => {
-    setIsStopWatchRunning(!isStopWatchRunning)
-  }
+    setIsStopWatchRunning(!isStopWatchRunning);
+  };
 
   return (
     <SafeAreaView className="flex-1">
@@ -77,7 +82,7 @@ const TrackingScreen = ({ route, navigation }) => {
         <View className="flex-row">
           <TouchableOpacity
             className="p-4 w-14 h-14 rounded-full bg-background"
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate("TabNavigation")}
           >
             <FontAwesomeIcon icon={faArrowLeft} size={22} color="#A5D936" />
           </TouchableOpacity>
@@ -156,8 +161,8 @@ const TrackingScreen = ({ route, navigation }) => {
               className="w-8 h-8"
             />
             <Text className="font-semibold text-2xl">
-              1.2{" "}
-              <Text className="text-base font-regular text-gray-500">km</Text>
+              {getPathLength(userCoordinates)}{" "}
+              <Text className="text-base font-regular text-gray-500">m</Text>
             </Text>
           </View>
           <View className="flex-row items-center">
@@ -165,7 +170,7 @@ const TrackingScreen = ({ route, navigation }) => {
               source={require("../assets/icons/time_icon.png")}
               className="w-8 h-8"
             />
-              <StopWatch isStopWatchRunning={isStopWatchRunning} />
+            <StopWatch isStopWatchRunning={isStopWatchRunning} distance={getPathLength(userCoordinates)} />
           </View>
           <View className="flex-row items-center gap-1">
             <Image
@@ -183,10 +188,14 @@ const TrackingScreen = ({ route, navigation }) => {
 
         <View className="flex-row gap-6 pb-4">
           <TouchableOpacity
-            className={`py-3 px-8 rounded-full ${isStopWatchRunning ? "bg-secondaryDark" : "bg-secondary"}`}
+            className={`py-3 px-8 rounded-full ${
+              isStopWatchRunning ? "bg-secondaryDark" : "bg-secondary"
+            }`}
             onPress={stopOrStartTracking}
           >
-            <Text className="text-white font-semibold text-lg">{isStopWatchRunning ? "Stop" : "Start"}</Text>
+            <Text className="text-white font-semibold text-lg">
+              {isStopWatchRunning ? "Stop" : "Start"}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity className="py-3 px-8 rounded-full bg-primary">
             <Text className="text-white font-semibold text-lg">

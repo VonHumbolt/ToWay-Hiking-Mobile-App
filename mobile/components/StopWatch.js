@@ -1,16 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text } from "react-native";
+import { useTrackingStore } from "../store";
 
-const StopWatch = ({isStopWatchRunning}) => {
+const StopWatch = ({isStopWatchRunning, distance}) => {
   const [time, setTime] = useState(0);
   const intervalRef = useRef(null);
   const startTimeRef = useRef(0);
+  const { tracking, startOrUpdateTracking } = useTrackingStore();
+  
 
   useEffect(() => {
     if (isStopWatchRunning) {
       startTimeRef.current = Date.now() - time;
       intervalRef.current = setInterval(() => {
         setTime(Math.floor(Date.now() - startTimeRef.current));
+        const trackingRoute = {
+          id: tracking.id,
+          title: tracking.title,
+          distance: distance,
+          time: Math.floor(Date.now() - startTimeRef.current),
+          speed: Math.floor(((distance / 1000) / Math.floor(Date.now() - startTimeRef.current) / (1000 * 60 * 60))),
+          isTrackingActive: true,
+        }
+        startOrUpdateTracking(trackingRoute)
       }, 10);
     }
     return () => {
