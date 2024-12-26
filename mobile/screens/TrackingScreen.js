@@ -13,31 +13,21 @@ import StartedRoutesService from "../services/StartedRoutesService";
 import * as SecureStore from "expo-secure-store";
 import { getPathLength } from "geolib";
 import StopWatch from "../components/StopWatch";
+import { useTrackingStore } from "../store";
+import { useDebouncedCallback } from "use-debounce";
 
 const TrackingScreen = ({ route, navigation }) => {
   const { routeDetail, startedRouteId } = route.params;
   const mapRef = useRef();
   const startedRoutesService = new StartedRoutesService();
+  const {
+    updateUserCoordinates,
+    updateDistance,
+    coordinatesFromUser,
+  } = useTrackingStore();
 
   const [userCoordinates, setUserCoordinates] = useState([]);
   const [isStopWatchRunning, setIsStopWatchRunning] = useState(true);
-
-  const getLocation = async () => {
-    const location = await Location.getCurrentPositionAsync({
-      // enableHighAccurancy: true
-    });
-
-    mapRef.current?.animateToRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.003,
-      longitudeDelta: 0.003,
-    });
-  };
-
-  useEffect(() => {
-    getLocation();
-  }, []);
 
   const zoomToUser = async () => {
     const location = await Location.getCurrentPositionAsync({});
@@ -50,9 +40,15 @@ const TrackingScreen = ({ route, navigation }) => {
     });
   };
 
-  const drawUserLocation = (coords) => {
-    setUserCoordinates([...userCoordinates, coords]);
-  };
+  const sendUserCoordinates = useDebouncedCallback(async (value) => {
+    console.log("DeBounce --> ", value)
+    const newCoordList = [...userCoordinates, value]
+    updateUserCoordinates(newCoordList);
+    const distance = getPathLength(newCoordList);
+    updateDistance(distance);
+    console.log(newCoordList.length)
+    setUserCoordinates([...userCoordinates, value]);
+  }, 1000);
 
   const updateTrackingRoute = () => {
     const distance = getPathLength(userCoordinates);
@@ -82,7 +78,10 @@ const TrackingScreen = ({ route, navigation }) => {
         <View className="flex-row">
           <TouchableOpacity
             className="p-4 w-14 h-14 rounded-full bg-background"
-            onPress={() => navigation.navigate("TabNavigation")}
+            onPress={() => {
+              setIsScreenReOpen(true)
+              navigation.navigate("TabNavigation")
+            }}
           >
             <FontAwesomeIcon icon={faArrowLeft} size={22} color="#A5D936" />
           </TouchableOpacity>
@@ -104,13 +103,21 @@ const TrackingScreen = ({ route, navigation }) => {
         ref={mapRef}
         style={StyleSheet.absoluteFill}
         mapType="satellite"
+        initialRegion={{
+          latitude: routeDetail?.coordinates[0].latitude,
+          longitude: routeDetail?.coordinates[0].longitude,
+          latitudeDelta: 0.003,
+          longitudeDelta: 0.003,
+        }}
         showsUserLocation
         followsUserLocation
         userLocationUpdateInterval={3000}
-        onUserLocationChange={(e) => drawUserLocation(e.nativeEvent.coordinate)}
+        onUserLocationChange={(e) =>{
+          sendUserCoordinates(e.nativeEvent.coordinate)
+        }}
       >
         <Polyline
-          coordinates={userCoordinates}
+          coordinates={coordinatesFromUser}
           strokeColor="#0396FF"
           strokeWidth={10}
           lineJoin="bevel"
@@ -161,7 +168,7 @@ const TrackingScreen = ({ route, navigation }) => {
               className="w-8 h-8"
             />
             <Text className="font-semibold text-2xl">
-              {getPathLength(userCoordinates)}{" "}
+              {getPathLength(coordinatesFromUser)}{" "}
               <Text className="text-base font-regular text-gray-500">m</Text>
             </Text>
           </View>
@@ -170,7 +177,7 @@ const TrackingScreen = ({ route, navigation }) => {
               source={require("../assets/icons/time_icon.png")}
               className="w-8 h-8"
             />
-            <StopWatch isStopWatchRunning={isStopWatchRunning} distance={getPathLength(userCoordinates)} />
+            <StopWatch isStopWatchRunning={isStopWatchRunning} />
           </View>
           <View className="flex-row items-center gap-1">
             <Image

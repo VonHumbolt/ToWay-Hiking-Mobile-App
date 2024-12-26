@@ -1,5 +1,3 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
 import "./global.css";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -13,10 +11,29 @@ import TrackingScreen from "./screens/TrackingScreen";
 import CreateRouteScreen from "./screens/CreateRouteScreen";
 import RouteDetailScreen from "./screens/RouteDetailScreen";
 import SignInScreen from "./screens/SignInScreen";
+import * as Location from "expo-location";
+import { useEffect } from "react";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+   const getLocation = async () => {
+      const location = await Location.getCurrentPositionAsync({
+        // enableHighAccurancy: true
+      });
+      
+      // console.log(location.coords.latitude, location.coords.longitude)
+    };
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        getLocation()
+      }, 10000);
+    
+      return () => clearInterval(interval);
+    }, [])
+    
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

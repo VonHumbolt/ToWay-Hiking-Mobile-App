@@ -23,7 +23,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
   const [isRouteSaved, setIsRouteSaved] = useState(false);
   const userService = new UserService();
   const startedRoutesService = new StartedRoutesService();
-  const { tracking, startOrUpdateTracking } = useTrackingStore();
+  const { tracking, startOrUpdateTime, startTracking } = useTrackingStore();
 
   useEffect(() => {
     getOwnerOfRoute();
@@ -110,11 +110,11 @@ const RouteDetailScreen = ({ route, navigation }) => {
               const tracking = {
                 id: res.data.id,
                 title: routeDetail.title,
-                distance: 0,
-                time: 0,
+                route: routeDetail,
                 isTrackingActive: true,
               }
-              startOrUpdateTracking(tracking)
+              startTracking(tracking)
+              startOrUpdateTime(0)
               navigation.navigate("Tracking", { routeDetail: routeDetail, startedRouteId: res.data.id })
             }
           });
