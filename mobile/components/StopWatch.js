@@ -5,7 +5,7 @@ import { useTrackingStore } from "../store";
 const StopWatch = ({isStopWatchRunning}) => {
   const intervalRef = useRef(null);
   const startTimeRef = useRef(0);
-  const { tracking, time, startOrUpdateTime } = useTrackingStore();
+  const { time, startOrUpdateTime } = useTrackingStore();
   const [elapsedTime, setElapsedTime] = useState(time);
   
 

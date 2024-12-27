@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const MiniTrackingBar = () => {
   const navigation = useNavigation()
-  const { tracking, time, distance } = useTrackingStore();
+  const { tracking, time, distance, averageSpeed } = useTrackingStore();
 
   const formatTime = () => {
     let hours = Math.floor(time / (1000 * 60 * 60));
@@ -53,7 +53,7 @@ const MiniTrackingBar = () => {
             className="w-7 h-7"
           />
           <Text className="font-regular text-xl">
-            {tracking.speed}{" "}
+            {averageSpeed}{" "}
             <Text className="text-base font-regular text-gray-500">km/h</Text>
           </Text>
         </View>

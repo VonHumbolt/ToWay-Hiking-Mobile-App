@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, Polyline } from "react-native-maps";
@@ -15,19 +21,37 @@ import { getPathLength } from "geolib";
 import StopWatch from "../components/StopWatch";
 import { useTrackingStore } from "../store";
 import { useDebouncedCallback } from "use-debounce";
+import AddPointModal from "../components/AddPointModal";
 
 const TrackingScreen = ({ route, navigation }) => {
   const { routeDetail, startedRouteId } = route.params;
   const mapRef = useRef();
   const startedRoutesService = new StartedRoutesService();
   const {
+    averageSpeed,
     updateUserCoordinates,
     updateDistance,
     coordinatesFromUser,
+    updateAverageSpeed,
+    distance,
+    time,
   } = useTrackingStore();
 
   const [userCoordinates, setUserCoordinates] = useState([]);
   const [isStopWatchRunning, setIsStopWatchRunning] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // sayfaya geri döndüğünde kullanıcı koordinatlarını çizmiyor. Bir bak!
+  useEffect(() => {
+    setUserCoordinates(coordinatesFromUser)
+
+    // Update backend with new user coordinates, distance and time every 20 seconds.
+    const interval = setInterval(() => {
+      updateTrackingRoute();
+    }, 20000);
+
+    return () => clearInterval(interval);
+  }, [distance]);
 
   const zoomToUser = async () => {
     const location = await Location.getCurrentPositionAsync({});
@@ -41,24 +65,29 @@ const TrackingScreen = ({ route, navigation }) => {
   };
 
   const sendUserCoordinates = useDebouncedCallback(async (value) => {
-    console.log("DeBounce --> ", value)
-    const newCoordList = [...userCoordinates, value]
+    console.log("DeBounce --> ", value);
+    const newCoordList = [...userCoordinates, value];
     updateUserCoordinates(newCoordList);
     const distance = getPathLength(newCoordList);
     updateDistance(distance);
-    console.log(newCoordList.length)
+    console.log(newCoordList.length);
     setUserCoordinates([...userCoordinates, value]);
-  }, 1000);
+
+    const seconds = Math.floor((time / 1000) % 60);
+    const speed =Math.floor((distance / seconds) * 10) / 10
+    updateAverageSpeed(speed);
+  }, 2000);
 
   const updateTrackingRoute = () => {
-    const distance = getPathLength(userCoordinates);
+    console.log("Distance -> ", getPathLength(coordinatesFromUser));
     SecureStore.getItemAsync("token").then((token) => {
       startedRoutesService
         .updateTracking(
           {
             id: startedRouteId,
-            userCoordinates: userCoordinates,
+            userCoordinates: coordinatesFromUser,
             distance: distance,
+            duration: time,
           },
           token
         )
@@ -72,6 +101,23 @@ const TrackingScreen = ({ route, navigation }) => {
     setIsStopWatchRunning(!isStopWatchRunning);
   };
 
+  const completeTheRote = () => {
+    // Eğer doğaçlama yürüyorsa kaydetme sayfasına yönlendir.
+    // Hazır bir rotayı yürüyorsa nereye yönlendirmeli ? Yorum sayfasına mı ?
+  };
+
+  const addPoint = async () => {
+    const location = await Location.getCurrentPositionAsync({});
+
+    const latitude = location.coords.latitude;
+    const longitude = location.coords.longitude;
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   return (
     <SafeAreaView className="flex-1">
       <View className="flex-row items-center justify-between px-6 mt-3 z-10">
@@ -79,8 +125,7 @@ const TrackingScreen = ({ route, navigation }) => {
           <TouchableOpacity
             className="p-4 w-14 h-14 rounded-full bg-background"
             onPress={() => {
-              setIsScreenReOpen(true)
-              navigation.navigate("TabNavigation")
+              navigation.navigate("TabNavigation");
             }}
           >
             <FontAwesomeIcon icon={faArrowLeft} size={22} color="#A5D936" />
@@ -111,13 +156,12 @@ const TrackingScreen = ({ route, navigation }) => {
         }}
         showsUserLocation
         followsUserLocation
-        userLocationUpdateInterval={3000}
-        onUserLocationChange={(e) =>{
-          sendUserCoordinates(e.nativeEvent.coordinate)
+        onUserLocationChange={(e) => {
+          sendUserCoordinates(e.nativeEvent.coordinate);
         }}
       >
         <Polyline
-          coordinates={coordinatesFromUser}
+          coordinates={userCoordinates}
           strokeColor="#0396FF"
           strokeWidth={10}
           lineJoin="bevel"
@@ -127,7 +171,7 @@ const TrackingScreen = ({ route, navigation }) => {
             <Marker coordinate={routeDetail?.coordinates[0]}>
               <Image
                 source={require("../assets/icons/start_icon.png")}
-                className="w-12 h-12"
+                className="w-14 h-14"
               />
             </Marker>
             <Marker
@@ -150,7 +194,10 @@ const TrackingScreen = ({ route, navigation }) => {
         )}
       </MapView>
 
-      <TouchableOpacity className="absolute bottom-1/4 left-4 px-4 py-3 rounded-full bg-background z-10">
+      <TouchableOpacity
+        className="absolute bottom-1/4 left-4 px-4 py-3 rounded-full bg-background z-10"
+        onPress={addPoint}
+      >
         <View className="flex-row items-center gap-1">
           <Image
             source={require("../assets/icons/add_point_icon.png")}
@@ -185,7 +232,7 @@ const TrackingScreen = ({ route, navigation }) => {
               className="w-8 h-8"
             />
             <Text className="font-semibold text-2xl">
-              2{" "}
+              {averageSpeed}{" "}
               <Text className="text-base font-regular text-gray-500">km/h</Text>
             </Text>
           </View>
@@ -204,7 +251,10 @@ const TrackingScreen = ({ route, navigation }) => {
               {isStopWatchRunning ? "Stop" : "Start"}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="py-3 px-8 rounded-full bg-primary">
+          <TouchableOpacity
+            className="py-3 px-8 rounded-full bg-primary"
+            onPress={completeTheRote()}
+          >
             <Text className="text-white font-semibold text-lg">
               Complete the route
             </Text>
@@ -212,6 +262,7 @@ const TrackingScreen = ({ route, navigation }) => {
         </View>
       </View>
 
+      <AddPointModal isOpen={modalVisible} closeModal={closeModal} />
       <StatusBar style="light" />
     </SafeAreaView>
   );

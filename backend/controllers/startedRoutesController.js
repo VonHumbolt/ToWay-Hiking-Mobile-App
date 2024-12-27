@@ -23,9 +23,17 @@ const startTracking = async (req, res) => {
 };
 
 const updateTracking = async (req, res) => {
-  const { id, userCoordinates, distance } = req.body;
+  const { id, userCoordinates, distance, duration } = req.body;
+  console.log("backend --> ", userCoordinates, distance);
   try {
-    const updatedRoute = await StartedRoutes.findByIdAndUpdate({_id: id}, {userCoordinates: userCoordinates, distance: distance});
+    const updatedRoute = await StartedRoutes.findByIdAndUpdate(
+      { _id: id },
+      {
+        userCoordinates: userCoordinates,
+        distance: distance,
+        duration: duration,
+      }
+    );
     res.status(200).json({
       id: updatedRoute._id,
       isUpdated: true,
@@ -36,4 +44,4 @@ const updateTracking = async (req, res) => {
   }
 };
 
-module.exports = {startTracking, updateTracking}
+module.exports = { startTracking, updateTracking };
