@@ -16,4 +16,13 @@ export default class RouteService {
       },
     });
   }
+  
+  addPointToRoute(formData, token) {
+    return axios.post(this.apiUrl + "addPointToRoute", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  }
 }

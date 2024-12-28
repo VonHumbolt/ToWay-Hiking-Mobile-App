@@ -4,10 +4,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Callout, Marker, Polyline } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import * as Location from "expo-location";
 import {
@@ -40,18 +41,24 @@ const TrackingScreen = ({ route, navigation }) => {
   const [userCoordinates, setUserCoordinates] = useState([]);
   const [isStopWatchRunning, setIsStopWatchRunning] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [importantPoints, setImportantPoints] = useState(
+    routeDetail?.importantPoints
+  );
 
-  // sayfaya geri döndüğünde kullanıcı koordinatlarını çizmiyor. Bir bak!
   useEffect(() => {
-    setUserCoordinates(coordinatesFromUser)
+    setUserCoordinates(coordinatesFromUser);
 
-    // Update backend with new user coordinates, distance and time every 20 seconds.
+    // Update backend with new user coordinates, distance and time every 1 minute.
     const interval = setInterval(() => {
       updateTrackingRoute();
-    }, 20000);
+    }, 60000);
+
+    const interval2 = setInterval(() => {
+      drawAndUpdateUserCoordinates();
+    }, 8000);
 
     return () => clearInterval(interval);
-  }, [distance]);
+  }, []);
 
   const zoomToUser = async () => {
     const location = await Location.getCurrentPositionAsync({});
@@ -64,19 +71,38 @@ const TrackingScreen = ({ route, navigation }) => {
     });
   };
 
-  const sendUserCoordinates = useDebouncedCallback(async (value) => {
-    console.log("DeBounce --> ", value);
-    const newCoordList = [...userCoordinates, value];
+  // const sendUserCoordinates = useDebouncedCallback(async (value) => {
+  //   console.log("DeBounce --> ", value);
+  //   const newCoordList = [...userCoordinates, value];
+  //   updateUserCoordinates(newCoordList);
+  //   const distance = getPathLength(newCoordList);
+  //   updateDistance(distance);
+  //   console.log(newCoordList.length);
+  //   setUserCoordinates([...userCoordinates, value]);
+
+  //   const seconds = Math.floor((time / 1000) % 60);
+  //   const speed = Math.floor((distance / seconds) * 10) / 10;
+  //   updateAverageSpeed(speed);
+  // }, 2000);
+
+  const drawAndUpdateUserCoordinates = useDebouncedCallback(async () => {
+    const location = await Location.getCurrentPositionAsync({});
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+    console.log("DeBounce 2 --> ", coords);
+    const newCoordList = [...userCoordinates, coords];
     updateUserCoordinates(newCoordList);
     const distance = getPathLength(newCoordList);
     updateDistance(distance);
     console.log(newCoordList.length);
-    setUserCoordinates([...userCoordinates, value]);
+    setUserCoordinates([...userCoordinates, coords]);
 
     const seconds = Math.floor((time / 1000) % 60);
-    const speed =Math.floor((distance / seconds) * 10) / 10
+    const speed = Math.floor((distance / seconds) * 10) / 10;
     updateAverageSpeed(speed);
-  }, 2000);
+  }, 6000);
 
   const updateTrackingRoute = () => {
     console.log("Distance -> ", getPathLength(coordinatesFromUser));
@@ -106,15 +132,13 @@ const TrackingScreen = ({ route, navigation }) => {
     // Hazır bir rotayı yürüyorsa nereye yönlendirmeli ? Yorum sayfasına mı ?
   };
 
-  const addPoint = async () => {
-    const location = await Location.getCurrentPositionAsync({});
-
-    const latitude = location.coords.latitude;
-    const longitude = location.coords.longitude;
-    setModalVisible(true);
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
-  const closeModal = () => {
+  const returnAddedPointsFromModal = (point) => {
+    console.log("Point ---> ", point);
+    setImportantPoints([...importantPoints, point]);
     setModalVisible(false);
   };
 
@@ -156,9 +180,9 @@ const TrackingScreen = ({ route, navigation }) => {
         }}
         showsUserLocation
         followsUserLocation
-        onUserLocationChange={(e) => {
-          sendUserCoordinates(e.nativeEvent.coordinate);
-        }}
+        // onUserLocationChange={(e) => {
+        //   sendUserCoordinates(e.nativeEvent.coordinate);
+        // }}
       >
         <Polyline
           coordinates={userCoordinates}
@@ -166,6 +190,39 @@ const TrackingScreen = ({ route, navigation }) => {
           strokeWidth={10}
           lineJoin="bevel"
         />
+
+        {importantPoints?.map((point, index) => (
+          <Marker
+            key={index}
+            coordinate={point.coordinate}
+          >
+            <Image
+              source={require("../assets/icons/point_icon.png")}
+              className="w-12 h-12"
+            />
+            <Callout tooltip>
+              <View className="w-72 bg-background rounded-2xl">
+                <ScrollView horizontal className="">
+                  {point?.images?.map((image, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: image }}
+                      className="w-72 h-36 rounded-t-2xl"
+                    />
+                  ))}
+                </ScrollView>
+                <View className="px-4 py-1">
+                  <Text className="font-semibold text-2xl text-body">
+                    {point.pointType}
+                  </Text>
+                  <Text className="font-regular text-base text-body mb-1 line-clamp-2">
+                    {point.description}
+                  </Text>
+                </View>
+              </View>
+            </Callout>
+          </Marker>
+        ))}
         {routeDetail && (
           <View>
             <Marker coordinate={routeDetail?.coordinates[0]}>
@@ -194,18 +251,20 @@ const TrackingScreen = ({ route, navigation }) => {
         )}
       </MapView>
 
-      <TouchableOpacity
-        className="absolute bottom-1/4 left-4 px-4 py-3 rounded-full bg-background z-10"
-        onPress={addPoint}
-      >
-        <View className="flex-row items-center gap-1">
-          <Image
-            source={require("../assets/icons/add_point_icon.png")}
-            className="w-7 h-7"
-          />
-          <Text className="font-semibold text-lg">Add point</Text>
-        </View>
-      </TouchableOpacity>
+      {!routeDetail && (
+        <TouchableOpacity
+          className="absolute bottom-1/4 left-4 px-4 py-3 rounded-full bg-background z-10"
+          onPress={() => setModalVisible(true)}
+        >
+          <View className="flex-row items-center gap-1">
+            <Image
+              source={require("../assets/icons/add_point_icon.png")}
+              className="w-7 h-7"
+            />
+            <Text className="font-semibold text-lg">Add point</Text>
+          </View>
+        </TouchableOpacity>
+      )}
 
       <View className="absolute bottom-0 w-full px-10 py-6 rounded-t-2xl bg-background z-10">
         <View className="flex-row items-center justify-between py-2">
@@ -262,7 +321,12 @@ const TrackingScreen = ({ route, navigation }) => {
         </View>
       </View>
 
-      <AddPointModal isOpen={modalVisible} closeModal={closeModal} />
+      <AddPointModal
+        routeId={routeDetail._id}
+        isOpen={modalVisible}
+        closeModal={closeModal}
+        returnPoint={returnAddedPointsFromModal}
+      />
       <StatusBar style="light" />
     </SafeAreaView>
   );

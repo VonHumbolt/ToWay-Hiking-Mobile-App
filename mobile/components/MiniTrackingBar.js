@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { useTrackingStore } from "../store";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, StackActions } from "@react-navigation/native";
 
 const MiniTrackingBar = () => {
   const navigation = useNavigation()
@@ -20,10 +20,10 @@ const MiniTrackingBar = () => {
   };
 
   const goToTrackingScreen = () => {
-    navigation.navigate("Tracking", {
+     navigation.dispatch(StackActions.popTo("Tracking", {
       routeDetail: tracking.route,
       startedRouteId: tracking.id,
-    });
+    }));
   };
   return (
     <View className="absolute bottom-1 w-full max-w-[372px] mx-6 px-6 py-4 shadow-sm bg-white rounded-2xl">

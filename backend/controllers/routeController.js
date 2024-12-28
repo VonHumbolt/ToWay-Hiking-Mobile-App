@@ -51,6 +51,41 @@ const createRoute = async (req, res) => {
   }
 };
 
+const addImportantPointsToRoute = async (req, res) => {
+  const {
+    routeId,
+    coordinate,
+    description,
+    pointType,
+  } = req.body;
+  console.log(req.body)
+  const parsedCoordinate = JSON.parse(coordinate);
+  console.log(req.files);
+  const pointImages = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const image = req.files[i];
+    pointImages.push(image.path);
+  }
+  const importantPoint = {
+    coordinate: parsedCoordinate,
+    description: description,
+    pointType: pointType,
+    images: pointImages
+  }
+  try {
+    const route = await Route.findById({_id: routeId});
+    const newImportantPoints = [...route.importantPoints, importantPoint]
+    const updatedRoute = await Route.findByIdAndUpdate({_id: routeId}, {importantPoints: newImportantPoints})
+    
+    console.log("Updated Route -> ", updatedRoute);
+    console.log("ImportantPoint -> ", importantPoint);
+    res.status(200).json(importantPoint);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+}
+
 const getFiveRoutesWithCityName = async (req, res) => {
   const { cityName } = req.params;
   try {
@@ -62,4 +97,4 @@ const getFiveRoutesWithCityName = async (req, res) => {
   }
 };
 
-module.exports = { createRoute, getFiveRoutesWithCityName };
+module.exports = { createRoute, addImportantPointsToRoute, getFiveRoutesWithCityName };

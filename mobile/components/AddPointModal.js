@@ -2,8 +2,6 @@ import {
   View,
   Text,
   Modal,
-  Pressable,
-  Alert,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
@@ -13,7 +11,6 @@ import {
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faCheck,
   faChevronDown,
   faCirclePlus,
   faClose,
@@ -21,12 +18,37 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import SelectDropdown from "react-native-select-dropdown";
+import * as Location from "expo-location";
+import * as SecureStore from "expo-secure-store";
+import RouteService from "../services/RouteService";
 
-const AddPointModal = ({ isOpen, closeModal }) => {
+const pointTypes = [
+  {
+    icon: require("../assets/icons/panorama_icon.png"),
+    name: "Panorama",
+  },
+  {
+    icon: require("../assets/icons/camp_icon.png"),
+    name: "Campground",
+  },
+  {
+    icon: require("../assets/icons/park_icon.png"),
+    name: "Park",
+  },
+  {
+    icon: require("../assets/icons/cave_icon.png"),
+    name: "Cave",
+  },
+];
+
+const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
   const [routeImages, setRouteImages] = useState([]);
   const [isImagesLoading, setIsImagesLoading] = useState(false);
-const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
-  
+  const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
+  const [selectedPointType, setSelectedPointType] = useState("");
+  const [description, setDescription] = useState("");
+
+  const routeService = new RouteService();
 
   const removeImageFromList = (image) => {
     const newList = routeImages.filter((i) => i != image);
@@ -76,6 +98,35 @@ const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
     );
     return resizedImage;
   };
+
+  const addPoint = async () => {
+    const location = await Location.getCurrentPositionAsync({});
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+
+    if (selectedPointType.trim().length > 0) {
+      const formData = new FormData();
+      formData.append("routeId", routeId);
+      formData.append("coordinate", JSON.stringify(coords));
+      formData.append("description", description);
+      formData.append("pointType", selectedPointType);
+      for (let i = 0; i < imageFilesForUpload.length; i++) {
+        formData.append("images[]", imageFilesForUpload[i]);
+      }
+
+      SecureStore.getItemAsync("token").then((token) => {
+        routeService
+          .addPointToRoute(formData, token)
+          .then((res) => {
+            if (res.status == 200) returnPoint(res.data);
+          })
+          .catch((err) => console.log(err.message));
+      });
+    }
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -95,8 +146,8 @@ const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
         </View>
 
         <View>
-          <Text className="text-xl font-semibold text-body mt-5 mb-3">
-            Add image
+          <Text className="text-lg font-semibold text-body mb-3 mt-5">
+            Add image <Text className="text-[#919191]"> (optional) </Text>
           </Text>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <View className="flex-row items-center gap-2">
@@ -130,15 +181,30 @@ const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
           </ScrollView>
         </View>
 
+        <Text className="mt-10 text-lg font-semibold text-body mb-3">
+          Point Type
+        </Text>
         <SelectDropdown
-          data={["Panorama", "Campground", "Park", "Cave"]}
-          onSelect={(selectedItem, index) => {}}
+          data={pointTypes}
+          onSelect={(selectedItem, index) => {
+            setSelectedPointType(selectedItem.name);
+          }}
           renderButton={(selectedItem, isOpened) => {
             return (
-              <TouchableOpacity className="mt-10 flex-row items-center gap-2 px-5 py-4 bg-[#E7E7E7] rounded-full">
-                <Text className="flex-grow font-regular text-[#919191]">
-                  {(selectedItem && selectedItem) || "Select point type"}
-                </Text>
+              <TouchableOpacity className=" flex-row items-center gap-2 px-5 py-4 bg-[#E7E7E7] rounded-full">
+                {(selectedItem && (
+                  <View className="flex-grow flex-row items-center gap-3">
+                    <Image source={selectedItem.icon} className="w-8 h-8" />
+                    <Text className="font-regular text-[#5F5F5F]">
+                      {selectedItem.name}
+                    </Text>
+                  </View>
+                )) || (
+                  <Text className="flex-grow font-regular text-[#919191]">
+                    Select point type
+                  </Text>
+                )}
+
                 <FontAwesomeIcon
                   icon={faChevronDown}
                   size={12}
@@ -149,43 +215,47 @@ const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
           }}
           renderItem={(item, index, isSelected) => {
             return (
-              <View className="px-5 py-2">
-                <Text className="font-regular text-lg">
-                  {isSelected ? (
-                    <Text>
-                      {" "}
-                      {item} <FontAwesomeIcon icon={faCheck} size={12} />{" "}
-                    </Text>
-                  ) : (
-                    item
-                  )}
+              <View
+                className={`px-5 py-2 flex-row items-center gap-3 ${
+                  index != 0 ? "border-t-2 border-[#E7E7E7]" : "border-none"
+                }`}
+              >
+                <Image source={item.icon} className="w-12 h-12" />
+                <Text className="font-regular text-lg text-[#5F5F5F]">
+                  {item.name}
                 </Text>
               </View>
             );
           }}
           showsVerticalScrollIndicator={false}
           dropdownStyle={{
-            borderRadius: 6,
+            borderRadius: 16,
             width: "90%",
             paddingVertical: 8,
             paddingHorizontal: 2,
           }}
         />
 
-        <Text className="text-xl font-semibold text-body mt-6 mb-3">
-          Description (optional)
+        <Text className="text-lg font-semibold text-body mt-10 mb-3">
+          Description <Text className="text-[#919191]"> (optional) </Text>
         </Text>
         <TextInput
           placeholder="Please something write about the point"
           autoCapitalize="sentences"
           clearButtonMode="always"
           multiline={true}
-          numberOfLines={5}
-          className="px-4 py-4 h-40 bg-[#E7E7E7]  rounded-3xl font-regular focus:border-primary focus:border-4"
+          numberOfLines={8}
+          onChangeText={(e) => setDescription(e)} // Düzelt
+          className="px-4 py-4 h-52 bg-[#E7E7E7]  rounded-3xl font-regular focus:border-primary focus:border-4"
         />
 
-        <TouchableOpacity className="rounded-full px-6 py-4 bg-primary mt-12">
-          <Text className="text-xl font-semibold text-white text-center">Save</Text>
+        <TouchableOpacity
+          className="rounded-full px-6 py-4 bg-primary mt-12"
+          onPress={addPoint}
+        >
+          <Text className="text-xl font-semibold text-white text-center">
+            Save
+          </Text>
         </TouchableOpacity>
       </View>
     </Modal>

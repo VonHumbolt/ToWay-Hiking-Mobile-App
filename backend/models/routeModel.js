@@ -56,6 +56,7 @@ const routeSchema = new Schema({
     },
     importantPoints: {
         type: Object,
+        default: []
     }
 }, {timestamps: true})
 

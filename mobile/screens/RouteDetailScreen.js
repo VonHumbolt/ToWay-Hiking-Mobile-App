@@ -115,7 +115,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
               }
               startTracking(tracking)
               startOrUpdateTime(0)
-              navigation.navigate("Tracking", { routeDetail: routeDetail, startedRouteId: res.data.id })
+              navigation.navigate("Tracking", { routeDetail: routeDetail, startedRouteId: res.data.id})
             }
           });
       });
