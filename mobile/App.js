@@ -11,28 +11,11 @@ import TrackingScreen from "./screens/TrackingScreen";
 import CreateRouteScreen from "./screens/CreateRouteScreen";
 import RouteDetailScreen from "./screens/RouteDetailScreen";
 import SignInScreen from "./screens/SignInScreen";
-import * as Location from "expo-location";
-import { useEffect } from "react";
+import RouteCompletedScreen from "./screens/RouteCompletedScreen";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-   const getLocation = async () => {
-      const location = await Location.getCurrentPositionAsync({
-        // enableHighAccurancy: true
-      });
-      
-      // console.log(location.coords.latitude, location.coords.longitude)
-    };
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        getLocation()
-      }, 10000);
-    
-      return () => clearInterval(interval);
-    }, [])
-    
 
   return (
     <NavigationContainer>
@@ -106,6 +89,13 @@ export default function App() {
           }}
           name="RouteDetail"
           component={RouteDetailScreen}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name="CompletedRoute"
+          component={RouteCompletedScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

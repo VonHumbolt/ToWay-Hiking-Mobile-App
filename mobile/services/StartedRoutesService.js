@@ -20,4 +20,12 @@ export default class StartedRoutesService {
             }
         })
     }
+   
+    completeTracking(data, token) {
+        return axios.post(this.apiUrl + "completeTracking", data, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+    }
 }

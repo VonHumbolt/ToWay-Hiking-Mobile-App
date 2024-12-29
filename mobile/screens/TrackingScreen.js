@@ -23,6 +23,7 @@ import StopWatch from "../components/StopWatch";
 import { useTrackingStore } from "../store";
 import { useDebouncedCallback } from "use-debounce";
 import AddPointModal from "../components/AddPointModal";
+import { StackActions } from "@react-navigation/native";
 
 const TrackingScreen = ({ route, navigation }) => {
   const { routeDetail, startedRouteId } = route.params;
@@ -36,6 +37,7 @@ const TrackingScreen = ({ route, navigation }) => {
     updateAverageSpeed,
     distance,
     time,
+    endTracking,
   } = useTrackingStore();
 
   const [userCoordinates, setUserCoordinates] = useState([]);
@@ -44,9 +46,11 @@ const TrackingScreen = ({ route, navigation }) => {
   const [importantPoints, setImportantPoints] = useState(
     routeDetail?.importantPoints
   );
+  const [isTrackingCompleted, setIsTrackingCompleted] = useState(false);
 
   useEffect(() => {
     setUserCoordinates(coordinatesFromUser);
+    console.log(isTrackingCompleted);
 
     // Update backend with new user coordinates, distance and time every 1 minute.
     const interval = setInterval(() => {
@@ -71,65 +75,93 @@ const TrackingScreen = ({ route, navigation }) => {
     });
   };
 
-  // const sendUserCoordinates = useDebouncedCallback(async (value) => {
-  //   console.log("DeBounce --> ", value);
-  //   const newCoordList = [...userCoordinates, value];
-  //   updateUserCoordinates(newCoordList);
-  //   const distance = getPathLength(newCoordList);
-  //   updateDistance(distance);
-  //   console.log(newCoordList.length);
-  //   setUserCoordinates([...userCoordinates, value]);
-
-  //   const seconds = Math.floor((time / 1000) % 60);
-  //   const speed = Math.floor((distance / seconds) * 10) / 10;
-  //   updateAverageSpeed(speed);
-  // }, 2000);
-
   const drawAndUpdateUserCoordinates = useDebouncedCallback(async () => {
-    const location = await Location.getCurrentPositionAsync({});
-    const coords = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    };
-    console.log("DeBounce 2 --> ", coords);
-    const newCoordList = [...userCoordinates, coords];
-    updateUserCoordinates(newCoordList);
-    const distance = getPathLength(newCoordList);
-    updateDistance(distance);
-    console.log(newCoordList.length);
-    setUserCoordinates([...userCoordinates, coords]);
+    if (!isTrackingCompleted) {
+      const location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      console.log("DeBounce 2 --> ", coords);
+      const newCoordList = [...userCoordinates, coords];
+      updateUserCoordinates(newCoordList);
+      const distance = getPathLength(newCoordList);
+      updateDistance(distance);
+      console.log(newCoordList.length);
+      setUserCoordinates([...userCoordinates, coords]);
 
-    const seconds = Math.floor((time / 1000) % 60);
-    const speed = Math.floor((distance / seconds) * 10) / 10;
-    updateAverageSpeed(speed);
+      const seconds = Math.floor((time / 1000) % 60);
+      const speed = Math.floor((distance / seconds) * 10) / 10;
+      updateAverageSpeed(speed);
+    }
   }, 6000);
 
-  const updateTrackingRoute = () => {
-    console.log("Distance -> ", getPathLength(coordinatesFromUser));
-    SecureStore.getItemAsync("token").then((token) => {
-      startedRoutesService
-        .updateTracking(
-          {
-            id: startedRouteId,
-            userCoordinates: coordinatesFromUser,
-            distance: distance,
-            duration: time,
-          },
-          token
-        )
-        .then((res) => {
-          console.log(res.data);
-        });
-    });
-  };
+  const updateTrackingRoute = useDebouncedCallback(async () => {
+    if (!isTrackingCompleted) {
+      console.log("Distance -> ", getPathLength(coordinatesFromUser));
+      console.log("Koords Length -> ", coordinatesFromUser.length);
+      SecureStore.getItemAsync("token").then((token) => {
+        startedRoutesService
+          .updateTracking(
+            {
+              id: startedRouteId,
+              userCoordinates: coordinatesFromUser,
+              distance: distance,
+              duration: time,
+            },
+            token
+          )
+          .then((res) => {
+            console.log(res.data);
+          });
+      });
+    }
+  }, 1000);
 
   const stopOrStartTracking = () => {
     setIsStopWatchRunning(!isStopWatchRunning);
   };
 
-  const completeTheRote = () => {
-    // Eğer doğaçlama yürüyorsa kaydetme sayfasına yönlendir.
-    // Hazır bir rotayı yürüyorsa nereye yönlendirmeli ? Yorum sayfasına mı ?
+  const completeTheRote = async () => {
+    setIsTrackingCompleted(true);
+    const location = await Location.getCurrentPositionAsync({});
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+
+    const lastUserCoordinates = [...userCoordinates, coords];
+    const lastDistance = getPathLength(lastUserCoordinates);
+    setIsStopWatchRunning(!isStopWatchRunning);
+    endTracking();
+    if (routeDetail) {
+      SecureStore.getItemAsync("token").then((token) => {
+        startedRoutesService
+          .completeTracking(
+            {
+              id: startedRouteId,
+              userCoordinates: lastUserCoordinates,
+              distance: lastDistance,
+              duration: time,
+            },
+            token
+          )
+          .then((res) => {
+            // Go to Route Completed Screen
+            console.log("Data " , res.data)
+            console.log("Koords " , res.data.completedRoute.userCoordinates)
+            if (res.status == 200)
+              navigation.dispatch(
+                StackActions.replace("CompletedRoute", {
+                  routeDetail: routeDetail,
+                  completedRoute: res.data.completedRoute,
+                })
+              );
+          });
+      });
+    } else {
+      // Eğer doğaçlama yürüyorsa kaydetme sayfasına yönlendir.
+    }
   };
 
   const closeModal = () => {
@@ -192,10 +224,7 @@ const TrackingScreen = ({ route, navigation }) => {
         />
 
         {importantPoints?.map((point, index) => (
-          <Marker
-            key={index}
-            coordinate={point.coordinate}
-          >
+          <Marker key={index} coordinate={point.coordinate}>
             <Image
               source={require("../assets/icons/point_icon.png")}
               className="w-12 h-12"
@@ -312,7 +341,7 @@ const TrackingScreen = ({ route, navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             className="py-3 px-8 rounded-full bg-primary"
-            onPress={completeTheRote()}
+            onPress={completeTheRote}
           >
             <Text className="text-white font-semibold text-lg">
               Complete the route

@@ -44,4 +44,27 @@ const updateTracking = async (req, res) => {
   }
 };
 
-module.exports = { startTracking, updateTracking };
+const completeTracking = async (req, res)  => {
+  const {id, userCoordinates, distance, duration} = req.body
+  try {
+    const completedRoute = await StartedRoutes.findByIdAndUpdate(
+      { _id: id },
+      {
+        userCoordinates: userCoordinates,
+        distance: distance,
+        duration: duration,
+        isRouteActive: false,
+        isCompleted: true,
+      }
+    );
+    console.log(completedRoute)
+    res.status(200).json({
+      completedRoute: completedRoute
+    });
+  } catch(error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+}
+ 
+module.exports = { startTracking, updateTracking, completeTracking };

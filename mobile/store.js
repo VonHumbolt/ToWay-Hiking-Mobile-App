@@ -11,5 +11,5 @@ export const useTrackingStore = create((set) => ({
     updateUserCoordinates: (coords) => set((state) => ({...state, coordinatesFromUser: coords})),
     updateDistance: (distance) => set((state) => ({...state, distance: distance})),
     updateAverageSpeed: (speed) => set((state) => ({...state, averageSpeed: speed})),
-    endTracking: () => set((state) => ({tracking: null}))
+    endTracking: () => set((state) => ({...state, tracking: null}))
 }))
