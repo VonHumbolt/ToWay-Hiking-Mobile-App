@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Route = require("../models/routeModel");
 const jwt = require("jsonwebtoken");
 
 const generateToken = async (_id) => {
@@ -145,6 +146,27 @@ const removeRouteFromUserSavedRoutes = async (req, res) => {
   }
 };
 
+const getUserSavedRoutes = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById({ _id: userId });
+    if (!user)
+      res.status(404).json({ error: "User was not found with given ID" });
+
+    const savedRoutesList = []
+    for (let i = 0; i < user.savedRoutes.length; i++) {
+      const routeId = user.savedRoutes[i];
+      const route = await Route.findById({_id: routeId})
+      savedRoutesList.push(route)
+    }
+    res.status(200).json({
+      savedRoutes: savedRoutesList
+    })
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createAccount,
   addCreatedRoute,
@@ -152,5 +174,6 @@ module.exports = {
   saveRouteForUser,
   removeRouteFromUserSavedRoutes,
   isRouteInUserSavedRoutes,
-  login
+  login,
+  getUserSavedRoutes
 };

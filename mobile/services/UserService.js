@@ -43,4 +43,15 @@ export default class UserService {
       }
     );
   }
+
+  getUserSavedRoutes(userId, token) {
+    return axios.get(
+      this.apiUrl + "getSavedRoutes/" + userId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
 }

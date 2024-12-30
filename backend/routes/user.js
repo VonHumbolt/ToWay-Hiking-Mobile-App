@@ -1,6 +1,6 @@
 const express  = require("express")
 
-const {createAccount, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes, login} = require("../controllers/userController")
+const {createAccount, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes, login, getUserSavedRoutes} = require("../controllers/userController")
 const requireAuth = require("../middleware/requireAuth")
 
 const router = express.Router()
@@ -16,5 +16,7 @@ router.use(requireAuth).post("/saveRoute/:routeId/:userId", saveRouteForUser)
 router.use(requireAuth).post("/removeRouteFromSaved/:routeId/:userId", removeRouteFromUserSavedRoutes)
 
 router.use(requireAuth).post("/isRouteSaved/:routeId/:userId", isRouteInUserSavedRoutes)
+
+router.use(requireAuth).get("/getSavedRoutes/:userId", getUserSavedRoutes)
 
 module.exports = router

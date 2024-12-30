@@ -245,7 +245,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           clearButtonMode="always"
           multiline={true}
           numberOfLines={8}
-          onChangeText={(e) => setDescription(e)} // Düzelt
+          onChangeText={(e) => setDescription(e)}
           className="px-4 py-4 h-52 bg-[#E7E7E7]  rounded-3xl font-regular focus:border-primary focus:border-4"
         />
 
