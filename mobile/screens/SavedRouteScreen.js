@@ -5,16 +5,20 @@ import MiniTrackingBar from "../components/MiniTrackingBar";
 import RouteCard from "../components/RouteCard.";
 import UserService from "../services/UserService";
 import * as SecureStore from "expo-secure-store";
+import { useIsFocused } from "@react-navigation/native";
 
 const SavedRouteScreen = () => {
   const { tracking } = useTrackingStore();
+  const isScreenFocused = useIsFocused()
   const [savedRoutes, setSavedRoutes] = useState([])
 
   const userService = new UserService()
 
   useEffect(() => {
-    getUserSavedRoutes()
-  }, [])
+    if(isScreenFocused) {
+      getUserSavedRoutes()
+    }
+  }, [isScreenFocused])
   
   const getUserSavedRoutes = () => {
     SecureStore.getItemAsync("userId").then(userId => {

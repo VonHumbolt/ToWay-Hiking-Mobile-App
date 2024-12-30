@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import convertMinuteToHour from "../utils/convertMinuteToHour";
 import UserService from "../services/UserService";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Callout, Marker, Polyline } from "react-native-maps";
 import getPastTimeFromDate from "../utils/getPastTimeFromDate";
 import Slider from "../components/Slider";
 import * as SecureStore from "expo-secure-store";
@@ -99,11 +99,14 @@ const RouteDetailScreen = ({ route, navigation }) => {
     SecureStore.getItemAsync("token").then((token) => {
       SecureStore.getItemAsync("userId").then((userId) => {
         startedRoutesService
-          .startTracking({
-            userId,
-            routeId: routeDetail._id,
-            userCoordinates: [],
-          }, token)
+          .startTracking(
+            {
+              userId,
+              routeId: routeDetail._id,
+              userCoordinates: [],
+            },
+            token
+          )
           .then((res) => {
             console.log(res.data);
             if (res.status == 200) {
@@ -112,10 +115,13 @@ const RouteDetailScreen = ({ route, navigation }) => {
                 title: routeDetail.title,
                 route: routeDetail,
                 isTrackingActive: true,
-              }
-              startTracking(tracking)
-              startOrUpdateTime(0)
-              navigation.navigate("Tracking", { routeDetail: routeDetail, startedRouteId: res.data.id})
+              };
+              startTracking(tracking);
+              startOrUpdateTime(0);
+              navigation.navigate("Tracking", {
+                routeDetail: routeDetail,
+                startedRouteId: res.data.id,
+              });
             }
           });
       });
@@ -213,13 +219,18 @@ const RouteDetailScreen = ({ route, navigation }) => {
         </View>
 
         {/* Highlights */}
-        {!routeDetail?.importantPoints && (
-          <View className="p-6 flex-row items-center gap-2 border-b border-[#E7E7E7]">
+        {routeDetail?.importantPoints && (
+          <View className="border-b border-[#E7E7E7] my-2">
             {/* Loop */}
-            <FontAwesomeIcon icon={faBolt} size={24} color="#A5D936" />
-            <Text className="font-regular">
-              {/* {routeDetail?.description} */} Highlight - 1
-            </Text>
+            {routeDetail?.importantPoints.map((point, index) => (
+              <View
+                key={index}
+                className="px-6 py-4 flex-row items-center gap-2 "
+              >
+                <FontAwesomeIcon icon={faBolt} size={24} color="#A5D936" />
+                <Text className="font-regular">{point?.pointType}</Text>
+              </View>
+            ))}
           </View>
         )}
 
@@ -257,7 +268,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
           <MapView
             style={{ flex: 1, borderRadius: 20 }}
             mapType="satellite"
-            pointerEvents="none"
+            // pointerEvents="none"
             initialRegion={{
               latitude:
                 routeDetail?.coordinates[
@@ -271,10 +282,42 @@ const RouteDetailScreen = ({ route, navigation }) => {
               longitudeDelta: 0.012,
             }}
           >
+            {/* Important Points */}
+            {routeDetail?.importantPoints &&
+              routeDetail?.importantPoints?.map((point, index) => (
+                <Marker key={index} coordinate={point.coordinate}>
+                  <Image
+                    source={require("../assets/icons/point_icon.png")}
+                    className="w-8 h-8"
+                  />
+                  <Callout tooltip>
+                    <View className="w-72 bg-background rounded-2xl">
+                      <ScrollView horizontal className="">
+                        {point?.images?.map((image, index) => (
+                          <Image
+                            key={index}
+                            source={{ uri: image }}
+                            className="w-72 h-36 rounded-t-2xl"
+                          />
+                        ))}
+                      </ScrollView>
+                      <View className="px-4 py-1">
+                        <Text className="font-semibold text-2xl text-body">
+                          {point.pointType}
+                        </Text>
+                        <Text className="font-regular text-base text-body mb-1 line-clamp-2">
+                          {point.description}
+                        </Text>
+                      </View>
+                    </View>
+                  </Callout>
+                </Marker>
+              ))}
+
             <Marker coordinate={routeDetail?.coordinates[0]}>
               <Image
                 source={require("../assets/icons/start_icon.png")}
-                className="w-10 h-10"
+                className="w-8 h-8"
               />
             </Marker>
             <Marker
@@ -284,7 +327,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
             >
               <Image
                 source={require("../assets/icons/finish_icon.png")}
-                className="w-10 h-10"
+                className="w-8 h-8"
               />
             </Marker>
             <Polyline

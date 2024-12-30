@@ -26,8 +26,8 @@ const HomeScreen = () => {
           </View>
           <TextInput
             clearButtonMode="always"
-            className="flex-grow px-12 py-4 bg-white rounded-3xl font-semibold"
-            placeholder="Find a route!"
+            className="flex-grow px-12 py-4 bg-white rounded-3xl font-semibold focus:border-primary focus:border-2"
+            placeholder="Find routes or users"
           />
           <FontAwesomeIcon icon={faFilter} color="#527324" size={28} />
         </View>

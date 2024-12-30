@@ -5,14 +5,19 @@ import {
   ScrollView,
   Image,
   KeyboardAvoidingView,
+  Pressable,
+  TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import convertMinuteToHour from "../utils/convertMinuteToHour";
 import CommentForm from "../components/CommentForm";
+import RouteCompletedModal from "../components/RouteCompletedModal";
 
 const RouteCompletedScreen = ({ route, navigation }) => {
   const { routeDetail, completedRoute } = route.params;
+
+  const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(true);
 
   const calculateAverageSpeed = () => {
     // const km = completedRoute?.distance / 1000;
@@ -126,6 +131,30 @@ const RouteCompletedScreen = ({ route, navigation }) => {
           <CommentForm routeId={routeDetail._id} />
         </KeyboardAvoidingView>
       </ScrollView>
+
+      {/* Completed Route Modal */}
+      <RouteCompletedModal isOpen={isCompletedModalOpen}>
+        <View className="bg-[#F6F6F6] w-full py-8 px-2 rounded-2xl items-center">
+          <Image
+            source={require("../assets/openingScreen/route_completed.png")}
+            className="w-80 h-64"
+          />
+          <Text className="font-bold text-primary text-center text-3xl mt-4">
+            Route Completed!
+          </Text>
+          <Text className="font-regular text-black text-base text-center px-8 my-2">
+            Great job! You’ve successfully created your route. Now, personalize
+            it by adding a name, uploading photos, or making final adjustments
+            before saving.
+          </Text>
+          <TouchableOpacity
+            className="w-52 py-3 px-6 mt-4 rounded-full bg-primary items-center justify-center"
+            onPress={() => setIsCompletedModalOpen(false)}
+          >
+            <Text className="text-lg text-white font-regular">Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </RouteCompletedModal>
     </SafeAreaView>
   );
 };

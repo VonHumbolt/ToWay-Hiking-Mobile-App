@@ -10,12 +10,12 @@ const PersonalizedRoutes = () => {
   const [personalizedRoutes, setPersonalizedRoutes] = useState([]);
 
   useEffect(() => {
-    SecureStore.getItemAsync("city").then(city => getPersonalizedRoutes(city))
+      SecureStore.getItemAsync("city").then(city => getPersonalizedRoutes(city))
   }, []);
 
   const getPersonalizedRoutes = (city) => {
     routeService
-      .getFiveRoutesWithCityName(city)
+      .getFiveRoutesWithCityName(city)  
       .then((res) => {
         if (res.status == 200) setPersonalizedRoutes(res.data);
       })
