@@ -39,6 +39,7 @@ const userSchema = new Schema({
   },
   profilePicture: {
     type: String,
+    default: "https://res.cloudinary.com/dspea8wm4/image/upload/v1701638455/default_profile_pic_szshsv.jpg"
   },
   createdRoutes: {
     type: mongoose.Schema.Types.Array,

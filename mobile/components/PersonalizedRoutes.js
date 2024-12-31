@@ -15,7 +15,7 @@ const PersonalizedRoutes = () => {
 
   const getPersonalizedRoutes = (city) => {
     routeService
-      .getFiveRoutesWithCityName(city)  
+      .getFiveRoutesWithCityName(city)
       .then((res) => {
         if (res.status == 200) setPersonalizedRoutes(res.data);
       })

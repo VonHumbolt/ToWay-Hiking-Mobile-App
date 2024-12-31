@@ -228,7 +228,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
                 className="px-6 py-4 flex-row items-center gap-2 "
               >
                 <FontAwesomeIcon icon={faBolt} size={24} color="#A5D936" />
-                <Text className="font-regular">{point?.pointType}</Text>
+                <Text className="font-regular">{point?.title} - {point?.pointType}</Text>
               </View>
             ))}
           </View>

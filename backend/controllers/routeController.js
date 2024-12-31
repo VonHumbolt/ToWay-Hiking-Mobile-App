@@ -55,6 +55,7 @@ const addImportantPointsToRoute = async (req, res) => {
   const {
     routeId,
     coordinate,
+    title,
     description,
     pointType,
   } = req.body;
@@ -68,6 +69,7 @@ const addImportantPointsToRoute = async (req, res) => {
   }
   const importantPoint = {
     coordinate: parsedCoordinate,
+    title: title,
     description: description,
     pointType: pointType,
     images: pointImages
@@ -97,4 +99,16 @@ const getFiveRoutesWithCityName = async (req, res) => {
   }
 };
 
-module.exports = { createRoute, addImportantPointsToRoute, getFiveRoutesWithCityName };
+const searchRoutesByCityName = async (req, res) => {
+  const {cityName} = req.params
+
+  try {
+    const routes = await Route.find({city: {$regex: cityName, $options: 'i'}}).limit(5);
+    res.status(200).json(routes)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({error: error.message})
+  }
+}
+
+module.exports = { createRoute, addImportantPointsToRoute, getFiveRoutesWithCityName, searchRoutesByCityName };

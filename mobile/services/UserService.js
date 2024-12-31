@@ -54,4 +54,8 @@ export default class UserService {
       }
     );
   }
+
+  searchUsersByName(name) {
+    return axios.get(this.apiUrl + "searchUserByName/" + name)
+  }
 }

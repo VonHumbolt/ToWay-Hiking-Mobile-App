@@ -167,6 +167,18 @@ const getUserSavedRoutes = async (req, res) => {
   }
 };
 
+const searchUserByName = async (req, res) => {
+  const {name} = req.params
+
+  try {
+    const users = await User.find({fullName: {$regex: name, $options: 'i'}}).limit(5)
+    res.status(200).json(users)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({error: error.message})
+  }
+}
+
 module.exports = {
   createAccount,
   addCreatedRoute,
@@ -175,5 +187,6 @@ module.exports = {
   removeRouteFromUserSavedRoutes,
   isRouteInUserSavedRoutes,
   login,
-  getUserSavedRoutes
+  getUserSavedRoutes,
+  searchUserByName,
 };

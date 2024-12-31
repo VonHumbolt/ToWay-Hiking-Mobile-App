@@ -46,6 +46,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
   const [isImagesLoading, setIsImagesLoading] = useState(false);
   const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
   const [selectedPointType, setSelectedPointType] = useState("");
+  const [title, setTitle] = useState("")
   const [description, setDescription] = useState("");
 
   const routeService = new RouteService();
@@ -110,6 +111,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
       const formData = new FormData();
       formData.append("routeId", routeId);
       formData.append("coordinate", JSON.stringify(coords));
+      formData.append("title", title);
       formData.append("description", description);
       formData.append("pointType", selectedPointType);
       for (let i = 0; i < imageFilesForUpload.length; i++) {
@@ -237,6 +239,17 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
         />
 
         <Text className="text-lg font-semibold text-body mt-10 mb-3">
+          Title
+        </Text>
+        <TextInput
+          placeholder="Name of the point"
+          autoCapitalize="words"
+          clearButtonMode="always"
+          onChangeText={(e) => setTitle(e)}
+          className="px-4 py-4 h-52 bg-[#E7E7E7] rounded-3xl font-regular focus:border-primary focus:border-4"
+        />
+
+        <Text className="text-lg font-semibold text-body mt-10 mb-3">
           Description <Text className="text-[#919191]"> (optional) </Text>
         </Text>
         <TextInput
@@ -246,7 +259,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           multiline={true}
           numberOfLines={8}
           onChangeText={(e) => setDescription(e)}
-          className="px-4 py-4 h-52 bg-[#E7E7E7]  rounded-3xl font-regular focus:border-primary focus:border-4"
+          className="px-4 py-4 h-52 bg-[#E7E7E7] rounded-3xl font-regular focus:border-primary focus:border-4"
         />
 
         <TouchableOpacity
