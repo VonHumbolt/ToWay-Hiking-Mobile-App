@@ -1,4 +1,6 @@
 const StartedRoutes = require("../models/startedRoutesModel");
+const Route = require("../models/routeModel");
+const User = require("../models/userModel");
 
 const startTracking = async (req, res) => {
   const { userId, routeId, userCoordinates } = req.body;
@@ -44,8 +46,8 @@ const updateTracking = async (req, res) => {
   }
 };
 
-const completeTracking = async (req, res)  => {
-  const {id, userCoordinates, distance, duration} = req.body
+const completeTracking = async (req, res) => {
+  const { id, userCoordinates, distance, duration } = req.body;
   try {
     const completedRoute = await StartedRoutes.findByIdAndUpdate(
       { _id: id },
@@ -57,14 +59,28 @@ const completeTracking = async (req, res)  => {
         isCompleted: true,
       }
     );
-    console.log(completedRoute)
+    await Route.findByIdAndUpdate(
+      { _id: completedRoute.routeId },
+      { $inc: { numberOfCompletions: 1 } }
+    );
+    await User.findByIdAndUpdate(
+      { _id: completedRoute.userId },
+      {
+        $inc: {
+          totalNumberOfCompletedRoutes: 1,
+          totalDistance: distance,
+          totalElapsedTime: duration,
+        },
+      }
+    );
+    console.log(completedRoute);
     res.status(200).json({
-      completedRoute: completedRoute
+      completedRoute: completedRoute,
     });
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     res.status(400).json({ error: error.message });
   }
-}
- 
+};
+
 module.exports = { startTracking, updateTracking, completeTracking };

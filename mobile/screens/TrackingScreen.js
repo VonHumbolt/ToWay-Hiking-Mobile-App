@@ -242,7 +242,7 @@ const TrackingScreen = ({ route, navigation }) => {
                 </ScrollView>
                 <View className="px-4 py-1">
                   <Text className="font-semibold text-2xl text-body">
-                    {point.pointType}
+                  {point.title}<Text className="font-semibold text-xl text-body"> ({point.pointType})</Text>
                   </Text>
                   <Text className="font-regular text-base text-body mb-1 line-clamp-2">
                     {point.description}

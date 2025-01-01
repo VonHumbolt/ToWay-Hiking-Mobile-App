@@ -57,7 +57,11 @@ const routeSchema = new Schema({
     importantPoints: {
         type: Object,
         default: []
-    }
+    },
+    numberOfCompletions: {
+        type: Number,
+        default: 0
+    },
 }, {timestamps: true})
 
 module.exports = mongoose.model("Route", routeSchema)

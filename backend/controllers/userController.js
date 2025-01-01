@@ -169,7 +169,7 @@ const getUserSavedRoutes = async (req, res) => {
 
 const searchUserByName = async (req, res) => {
   const {name} = req.params
-
+  // Kullanıcının tüm bilgilerini döndürme !
   try {
     const users = await User.find({fullName: {$regex: name, $options: 'i'}}).limit(5)
     res.status(200).json(users)

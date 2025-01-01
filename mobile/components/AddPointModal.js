@@ -183,7 +183,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           </ScrollView>
         </View>
 
-        <Text className="mt-10 text-lg font-semibold text-body mb-3">
+        <Text className="mt-6 text-lg font-semibold text-body mb-3">
           Point Type
         </Text>
         <SelectDropdown
@@ -193,7 +193,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           }}
           renderButton={(selectedItem, isOpened) => {
             return (
-              <TouchableOpacity className=" flex-row items-center gap-2 px-5 py-4 bg-[#E7E7E7] rounded-full">
+              <TouchableOpacity className="flex-row items-center gap-2 px-5 py-4 bg-[#E7E7E7] rounded-full">
                 {(selectedItem && (
                   <View className="flex-grow flex-row items-center gap-3">
                     <Image source={selectedItem.icon} className="w-8 h-8" />
@@ -238,7 +238,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           }}
         />
 
-        <Text className="text-lg font-semibold text-body mt-10 mb-3">
+        <Text className="text-lg font-semibold text-body mt-6 mb-3">
           Title
         </Text>
         <TextInput
@@ -246,10 +246,10 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           autoCapitalize="words"
           clearButtonMode="always"
           onChangeText={(e) => setTitle(e)}
-          className="px-4 py-4 h-52 bg-[#E7E7E7] rounded-3xl font-regular focus:border-primary focus:border-4"
+          className="px-4 py-4 bg-[#E7E7E7] placeholder:text-[#5F5F5F]/70 rounded-3xl font-regular focus:border-primary focus:border-4"
         />
 
-        <Text className="text-lg font-semibold text-body mt-10 mb-3">
+        <Text className="text-lg font-semibold text-body mt-6 mb-3">
           Description <Text className="text-[#919191]"> (optional) </Text>
         </Text>
         <TextInput
@@ -259,7 +259,7 @@ const AddPointModal = ({ routeId, isOpen, closeModal, returnPoint }) => {
           multiline={true}
           numberOfLines={8}
           onChangeText={(e) => setDescription(e)}
-          className="px-4 py-4 h-52 bg-[#E7E7E7] rounded-3xl font-regular focus:border-primary focus:border-4"
+          className="px-4 py-4 h-52 bg-[#E7E7E7] placeholder:text-[#5F5F5F]/70 rounded-3xl font-regular focus:border-primary focus:border-4"
         />
 
         <TouchableOpacity

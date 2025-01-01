@@ -52,14 +52,8 @@ const createRoute = async (req, res) => {
 };
 
 const addImportantPointsToRoute = async (req, res) => {
-  const {
-    routeId,
-    coordinate,
-    title,
-    description,
-    pointType,
-  } = req.body;
-  console.log(req.body)
+  const { routeId, coordinate, title, description, pointType } = req.body;
+  console.log(req.body);
   const parsedCoordinate = JSON.parse(coordinate);
   console.log(req.files);
   const pointImages = [];
@@ -72,13 +66,16 @@ const addImportantPointsToRoute = async (req, res) => {
     title: title,
     description: description,
     pointType: pointType,
-    images: pointImages
-  }
+    images: pointImages,
+  };
   try {
-    const route = await Route.findById({_id: routeId});
-    const newImportantPoints = [...route.importantPoints, importantPoint]
-    const updatedRoute = await Route.findByIdAndUpdate({_id: routeId}, {importantPoints: newImportantPoints})
-    
+    const route = await Route.findById({ _id: routeId });
+    const newImportantPoints = [...route.importantPoints, importantPoint];
+    const updatedRoute = await Route.findByIdAndUpdate(
+      { _id: routeId },
+      { importantPoints: newImportantPoints }
+    );
+
     console.log("Updated Route -> ", updatedRoute);
     console.log("ImportantPoint -> ", importantPoint);
     res.status(200).json(importantPoint);
@@ -86,29 +83,50 @@ const addImportantPointsToRoute = async (req, res) => {
     console.log(error);
     res.status(400).json({ error: error.message });
   }
-}
+};
 
 const getFiveRoutesWithCityName = async (req, res) => {
   const { cityName } = req.params;
   try {
-    const routes = await Route.find({ city: cityName, isPublic: true }).limit(5);
+    const routes = await Route.find({ city: cityName, isPublic: true }).limit(
+      5
+    );
     res.status(200).json(routes);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
 
 const searchRoutesByCityName = async (req, res) => {
-  const {cityName} = req.params
-
+  const { cityName } = req.params;
   try {
-    const routes = await Route.find({city: {$regex: cityName, $options: 'i'}}).limit(5);
-    res.status(200).json(routes)
+    const routes = await Route.find({
+      city: { $regex: cityName, $options: "i" },
+    }).limit(5);
+    res.status(200).json(routes);
   } catch (error) {
-    console.log(error)
-    res.status(400).json({error: error.message})
+    console.log(error);
+    res.status(400).json({ error: error.message });
   }
-}
+};
 
-module.exports = { createRoute, addImportantPointsToRoute, getFiveRoutesWithCityName, searchRoutesByCityName };
+const getRoutesByNumberOfCompletions = async (req, res) => {
+  try {
+    const routes = await Route.find({})
+      .sort({ numberOfCompletions: "descending" })
+      .limit(5);
+    res.status(200).json(routes);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createRoute,
+  addImportantPointsToRoute,
+  getFiveRoutesWithCityName,
+  searchRoutesByCityName,
+  getRoutesByNumberOfCompletions,
+};

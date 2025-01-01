@@ -219,16 +219,19 @@ const RouteDetailScreen = ({ route, navigation }) => {
         </View>
 
         {/* Highlights */}
-        {routeDetail?.importantPoints && (
+        {routeDetail?.importantPoints.length > 0 && (
           <View className="border-b border-[#E7E7E7] my-2">
             {/* Loop */}
             {routeDetail?.importantPoints.map((point, index) => (
               <View
                 key={index}
-                className="px-6 py-4 flex-row items-center gap-2 "
+                className="px-6 py-4 flex-row items-center gap-3"
               >
                 <FontAwesomeIcon icon={faBolt} size={24} color="#A5D936" />
-                <Text className="font-regular">{point?.title} - {point?.pointType}</Text>
+                <Text className="font-regular text-lg">
+                  {point?.title}
+                  <Text className="font-regular text-base"> ({point?.pointType})</Text>
+                </Text>
               </View>
             ))}
           </View>
@@ -303,7 +306,11 @@ const RouteDetailScreen = ({ route, navigation }) => {
                       </ScrollView>
                       <View className="px-4 py-1">
                         <Text className="font-semibold text-2xl text-body">
-                          {point.pointType}
+                          {point.title}
+                          <Text className="font-semibold text-xl text-body">
+                            {" "}
+                            ({point.pointType})
+                          </Text>
                         </Text>
                         <Text className="font-regular text-base text-body mb-1 line-clamp-2">
                           {point.description}

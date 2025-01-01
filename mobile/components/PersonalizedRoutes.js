@@ -23,7 +23,7 @@ const PersonalizedRoutes = () => {
   };
   return (
     <View>
-      <Text className="mt-6 font-semibold text-lg text-body mb-5">Personalized Routes</Text>
+      <Text className="mt-8 font-semibold text-xl text-body mb-5">Personalized Routes</Text>
       {personalizedRoutes?.map((route) => (
         <RouteCard key={route?._id} route={route} />
       ))}
