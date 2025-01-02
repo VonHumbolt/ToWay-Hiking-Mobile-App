@@ -69,11 +69,9 @@ const addImportantPointsToRoute = async (req, res) => {
     images: pointImages,
   };
   try {
-    const route = await Route.findById({ _id: routeId });
-    const newImportantPoints = [...route.importantPoints, importantPoint];
     const updatedRoute = await Route.findByIdAndUpdate(
       { _id: routeId },
-      { importantPoints: newImportantPoints }
+      { $push: { importantPoints: importantPoint } }
     );
 
     console.log("Updated Route -> ", updatedRoute);

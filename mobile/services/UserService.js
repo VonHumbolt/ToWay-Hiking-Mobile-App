@@ -54,6 +54,28 @@ export default class UserService {
       }
     );
   }
+  
+  getUserCompletedRoutes(userId, token) {
+    return axios.get(
+      this.apiUrl + "getCompletedRoutes/" + userId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+  
+  getUserCreatedRoutes(ownerId, profileId, token) {
+    return axios.get(
+      this.apiUrl + "getCreatedRoutes/" + ownerId + "/" + profileId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
 
   searchUsersByName(name) {
     return axios.get(this.apiUrl + "searchUserByName/" + name)

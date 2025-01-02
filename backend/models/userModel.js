@@ -38,6 +38,10 @@ const userSchema = new Schema(
       type: [],
       default: [],
     },
+    completedRoutes: {
+      type: [],
+      default: []
+    },
     profilePicture: {
       type: String,
       default:

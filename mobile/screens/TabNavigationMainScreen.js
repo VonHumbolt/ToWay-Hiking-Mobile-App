@@ -1,12 +1,15 @@
 import { View, Text, Image } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
 import ProfileScreen from "./ProfileScreen";
 import SavedRouteScreen from "./SavedRouteScreen";
+import * as SecureStore from "expo-secure-store";
+
 
 const Tab = createBottomTabNavigator();
+const ownId = SecureStore.getItem("userId")
 
 const TabNavigationMainScreen = () => {
   return (
@@ -14,6 +17,7 @@ const TabNavigationMainScreen = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
+        animation: "fade",
         tabBarStyle: {
           backgroundColor: "#A5D936",
           height: 75,
@@ -83,6 +87,7 @@ const TabNavigationMainScreen = () => {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        initialParams={{userId: ownId}}
         options={{
           tabBarIcon: ({ focused }) => (
             focused ? (

@@ -52,6 +52,9 @@ const getUserById = async (req, res) => {
       fullName: user.fullName,
       country: user.country,
       profilePicture: user.profilePicture,
+      totalNumberOfCompletedRoutes: user.totalNumberOfCompletedRoutes,
+      totalDistance: user.totalDistance,
+      totalElapsedTime: user.totalElapsedTime,
       createdAt: user.createdAt,
     });
   } catch (error) {
@@ -171,8 +174,59 @@ const searchUserByName = async (req, res) => {
   const {name} = req.params
   // Kullanıcının tüm bilgilerini döndürme !
   try {
-    const users = await User.find({fullName: {$regex: name, $options: 'i'}}).limit(5)
+    const users = await User.find({fullName: {$regex: name, $options: 'i'}}).select("userId fullName profilePicture").limit(5)
     res.status(200).json(users)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({error: error.message})
+  }
+}
+
+const getUserCompletedRoutes = async (req, res) => {
+  const {userId} = req.params;
+  try {
+    const user = await User.findById({_id: userId})
+    if (!user)
+      res.status(404).json({ error: "User was not found with given ID" });
+
+    const completedRouteList = []
+    for (let i = 0; i < user.completedRoutes.length; i++) {
+      const routeId = user.completedRoutes[i];
+      const route = await Route.findById({_id: routeId})
+      completedRouteList.push(route)
+    }
+    res.status(200).json({
+      completedRoutes: completedRouteList
+    }) 
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({error: error.message})
+  }
+}
+
+const getUserCreatedRoutes = async (req, res) => {
+  const {ownerId, profileId} = req.params;
+  try {
+    const createdRouteList = []
+    
+    const user = await User.findById({_id: profileId})
+    // If user is in own profile, user can view all created routes without visibility problems.
+    if(ownerId == profileId) {
+      for (let i = 0; i < user.createdRoutes.length; i++) {
+        const routeId = user.createdRoutes[i];
+        const route = await Route.findById({_id: routeId})
+        createdRouteList.push(route)
+      }
+    } else { // If user is in other user's profile, user can view only public visibility routes.
+      for (let i = 0; i < user.createdRoutes.length; i++) {
+        const routeId = user.createdRoutes[i];
+        const route = await Route.findOne({_id: routeId, isPublic: true})
+        createdRouteList.push(route)
+      }
+    }
+    res.status(200).json({
+      createdRoutes: createdRouteList
+    }) 
   } catch (error) {
     console.log(error)
     res.status(400).json({error: error.message})
@@ -189,4 +243,6 @@ module.exports = {
   login,
   getUserSavedRoutes,
   searchUserByName,
+  getUserCompletedRoutes,
+  getUserCreatedRoutes
 };

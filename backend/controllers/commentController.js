@@ -17,9 +17,7 @@ const addComment = async (req, res) => {
     });
     console.log("Created -> ", comment)
     
-    const route = await Route.findById({_id: routeId});
-    const newCommentList = [...route.comments, comment]
-    await Route.findByIdAndUpdate({_id: routeId}, {comments: newCommentList})
+    await Route.findByIdAndUpdate({_id: routeId}, { $push: { comments: comment } })
 
     res.status(200).json({
       comment: comment

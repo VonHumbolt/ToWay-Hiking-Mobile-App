@@ -71,6 +71,7 @@ const completeTracking = async (req, res) => {
           totalDistance: distance,
           totalElapsedTime: duration,
         },
+        $push: { completedRoutes: completedRoute.routeId }
       }
     );
     console.log(completedRoute);

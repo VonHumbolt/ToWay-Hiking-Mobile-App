@@ -245,8 +245,7 @@ const RouteDetailScreen = ({ route, navigation }) => {
               <Image
                 source={{
                   uri:
-                    routeOwner?.profilePicture ||
-                    "https://res.cloudinary.com/dspea8wm4/image/upload/v1701638455/default_profile_pic_szshsv.jpg",
+                    routeOwner?.profilePicture
                 }}
                 className="w-14 h-14 rounded-full"
               />

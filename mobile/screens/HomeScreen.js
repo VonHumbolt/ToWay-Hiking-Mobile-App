@@ -18,8 +18,10 @@ import { useTrackingStore } from "../store";
 import RouteService from "../services/RouteService";
 import UserService from "../services/UserService";
 import { useDebouncedCallback } from "use-debounce";
+import { useIsFocused } from "@react-navigation/native";
 
 const HomeScreen = ({navigation}) => {
+  const isScreenFocused = useIsFocused()
   const { tracking } = useTrackingStore();
   const routeService = new RouteService();
   const userService = new UserService();
@@ -28,11 +30,15 @@ const HomeScreen = ({navigation}) => {
   const [searchedUsers, setSearchedUsers] = useState([]);
 
   useEffect(() => {
+    if(!isScreenFocused) {
+      setSearchedRoutes([])
+      setSearchedUsers([])
+    }
     // SecureStore.deleteItemAsync("userId")
     // SecureStore.deleteItemAsync("email")
     // SecureStore.deleteItemAsync("token")
     // SecureStore.deleteItemAsync("city")
-  }, []);
+  }, [isScreenFocused]);
 
   const searchRoutesByCityName = async (searchInput) => {
     routeService.searchRoutesByCityName(searchInput).then((res) => {
@@ -131,9 +137,10 @@ const HomeScreen = ({navigation}) => {
               >
                 {/* Users Loop */}
                 {searchedUsers.map((user) => (
-                  <View
+                  <TouchableOpacity
                     key={user._id}
                     className="mr-2 mt-3 mb-2 justify-center items-center"
+                    onPress={() => navigation.navigate("Profile", { userId: user._id })}
                   >
                     <Image
                       source={{ uri: user?.profilePicture }}
@@ -142,7 +149,7 @@ const HomeScreen = ({navigation}) => {
                     <Text className="text-sm font-regular text-body mt-1 w-20 text-center">
                       {user?.fullName}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
                 {searchedUsers.length == 0 && (
                   <View className="w-96 my-2">
