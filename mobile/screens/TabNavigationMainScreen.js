@@ -1,12 +1,11 @@
 import { View, Text, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
 import ProfileScreen from "./ProfileScreen";
 import SavedRouteScreen from "./SavedRouteScreen";
 import * as SecureStore from "expo-secure-store";
-
 
 const Tab = createBottomTabNavigator();
 const ownId = SecureStore.getItem("userId")

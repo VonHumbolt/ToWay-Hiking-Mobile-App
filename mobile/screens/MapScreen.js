@@ -5,8 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Modal,
-  Button,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
@@ -19,6 +17,9 @@ import {
 import { faRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { getPathLength } from "geolib";
+import StartedRoutesService from "../services/StartedRoutesService";
+import * as SecureStore from "expo-secure-store";
+import { useTrackingStore } from "../store";
 
 const MapScreen = ({ navigation }) => {
   const mapRef = useRef();
@@ -28,6 +29,9 @@ const MapScreen = ({ navigation }) => {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeLength, setRouteLength] = useState("0");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const {startOrUpdateTime, startTracking} = useTrackingStore()
+  const startedRoutesService = new StartedRoutesService();
 
   const getLocationPermission = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -70,6 +74,39 @@ const MapScreen = ({ navigation }) => {
     setRouteCoordinates(newCoords);
   };
 
+   const startTrackingTheRoute = () => {
+      SecureStore.getItemAsync("token").then((token) => {
+        SecureStore.getItemAsync("userId").then((userId) => {
+          startedRoutesService
+            .startTracking(
+              {
+                userId,
+                routeId: null,
+                userCoordinates: [],
+              },
+              token
+            )
+            .then((res) => {
+              console.log(res.data);
+              if (res.status == 200) {
+                const tracking = {
+                  id: res.data.id,
+                  title: "New Route",
+                  route: null,
+                  isTrackingActive: true,
+                };
+                startTracking(tracking);
+                startOrUpdateTime(0);
+                navigation.navigate("Tracking", {
+                  routeDetail: null,
+                  startedRouteId: res.data.id,
+                });
+              }
+            });
+        });
+      });
+    };
+
   return (
     <SafeAreaView className="flex-1">
       <MapView
@@ -90,7 +127,7 @@ const MapScreen = ({ navigation }) => {
             </Text>
 
             <TouchableOpacity className="flex flex-row justify-center items-center gap-2 py-3 px-8 rounded-3xl bg-primary"
-              onPress={() => navigation.navigate("CreateRoute", { routeCoordinates: routeCoordinates, distance: routeLength })}>
+              onPress={() => navigation.navigate("CreateRoute", { routeCoordinates: routeCoordinates, distance: routeLength, time:0 })}>
               <FontAwesomeIcon icon={faBookmark} size={18} color="white" />
               <Text className="text-white font-semibold text-lg">Save</Text>
             </TouchableOpacity>
@@ -123,7 +160,7 @@ const MapScreen = ({ navigation }) => {
         )}
 
         <Polyline
-          strokeColor="white"
+          strokeColor="#E16308"
           strokeWidth={8}
           lineJoin="bevel"
           coordinates={routeCoordinates}
@@ -132,7 +169,7 @@ const MapScreen = ({ navigation }) => {
 
       <TouchableOpacity
         className="absolute bottom-32 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-2 py-3 px-4 rounded-3xl bg-secondaryDark z-10"
-        onPress={() => navigation.navigate("Tracking", {routeDetail: null})}
+        onPress={startTrackingTheRoute}
       >
         <Text className="text-white font-semibold text-lg">
           Start Without Route

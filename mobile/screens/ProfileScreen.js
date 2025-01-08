@@ -12,12 +12,14 @@ import { useTrackingStore } from "../store";
 import MiniTrackingBar from "../components/MiniTrackingBar";
 import UserService from "../services/UserService";
 import * as SecureStore from "expo-secure-store";
-import { useIsFocused } from "@react-navigation/native";
+import { StackActions, useIsFocused } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faRightFromBracket, faShareNodes } from "@fortawesome/free-solid-svg-icons";
 
 const ProfileScreen = ({ route, navigation }) => {
-  const { userId } = route.params
+  const { userId } = route.params;
   const isScreenFocused = useIsFocused();
   const { tracking } = useTrackingStore();
   const userService = new UserService();
@@ -28,13 +30,12 @@ const ProfileScreen = ({ route, navigation }) => {
   const [createdRoutes, setCreatedRoutes] = useState([]);
   const [isImagesLoading, setIsImagesLoading] = useState(false);
   const [profileImage, setProfileImage] = useState();
-  const [imageFile, setImageFile] = useState();
 
   useEffect(() => {
     if (isScreenFocused) {
       SecureStore.getItemAsync("userId").then((ownId) => {
         setIsUserOwnProfile(userId == ownId);
-      })
+      });
       getUserById();
       getUserCompletedRoutes();
       getUserCreatedRoutes();
@@ -86,9 +87,16 @@ const ProfileScreen = ({ route, navigation }) => {
     const type = match ? `image/${match[1]}` : `image`;
 
     setProfileImage(image.uri);
-    setImageFile({ uri: image.uri, name: filename, type });
+    // setImageFile({ uri: image.uri, name: filename, type });
     // update user profile picture
-    setIsImagesLoading(false);
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("images", { uri: image.uri, name: filename, type });
+    SecureStore.getItemAsync("token").then((token) => {
+      userService.updateProfileImage(formData, token).then((res) => {
+        if (res.status == 200) setIsImagesLoading(false);
+      });
+    });
   };
 
   const resizeImage = async (image) => {
@@ -103,13 +111,26 @@ const ProfileScreen = ({ route, navigation }) => {
     return resizedImage;
   };
 
+  const logout = () => {
+    SecureStore.deleteItemAsync("userId")
+    SecureStore.deleteItemAsync("email")
+    SecureStore.deleteItemAsync("token")
+    SecureStore.deleteItemAsync("city")
+
+    navigation.dispatch(StackActions.replace("SignIn"));
+  }
+
   return (
     <SafeAreaView className="flex-1 relative bg-background mb-28">
       <ScrollView>
         <View className="flex-row gap-6 px-6 mt-4">
           <TouchableOpacity disabled={!isUserOwnProfile} onPress={pickImage}>
             {isImagesLoading && (
-              <ActivityIndicator size="large" color="#A5D936" />
+              <ActivityIndicator
+                size="large"
+                color="#A5D936"
+                className="absolute top-20 left-16 z-10"
+              />
             )}
             <Image
               source={{
@@ -192,9 +213,9 @@ const ProfileScreen = ({ route, navigation }) => {
           showsHorizontalScrollIndicator={false}
           className="flex-row mx-6 mt-4"
         >
-          {completedRoutes?.map((route) => (
+          {completedRoutes?.map((route, index) => (
             <TouchableOpacity
-              key={route._id}
+              key={index}
               className="rounded-3xl bg-primary items-center mr-5"
               onPress={() =>
                 navigation.navigate("RouteDetail", { routeDetail: route })
@@ -244,6 +265,29 @@ const ProfileScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        {/* Divider */}
+        <View className="border-[0.6px] border-[#E7E7E7] my-6" />
+
+        {/* Profile Settings */}
+          {isUserOwnProfile && (
+            <TouchableOpacity className="mx-6 px-6 py-4 bg-white rounded-full flex-row items-center gap-2">
+              <FontAwesomeIcon icon={faShareNodes} color="#101010" size={20} />
+              <Text className="text-body text-lg font-regular">Share Profile</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Logout Settings */}
+          {isUserOwnProfile && (
+            <TouchableOpacity className="mx-6 mt-3 mb-4 px-6 py-4 bg-white rounded-full flex-row items-center gap-2"
+              onPress={logout}
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} color="#101010" size={20} />
+              <Text className="text-body text-lg font-regular">Logout</Text>
+            </TouchableOpacity>
+          )}
+
+
       </ScrollView>
 
       {tracking && <MiniTrackingBar />}

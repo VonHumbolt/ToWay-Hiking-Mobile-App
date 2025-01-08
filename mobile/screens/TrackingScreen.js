@@ -52,6 +52,11 @@ const TrackingScreen = ({ route, navigation }) => {
     setUserCoordinates(coordinatesFromUser);
     console.log(isTrackingCompleted);
 
+    // If user walk without a route. Focus user location in opening
+    if (!routeDetail) {
+      zoomToUser();
+    }
+
     // Update backend with new user coordinates, distance and time every 1 minute.
     const interval = setInterval(() => {
       updateTrackingRoute();
@@ -119,6 +124,7 @@ const TrackingScreen = ({ route, navigation }) => {
   }, 1000);
 
   const stopOrStartTracking = () => {
+    setIsTrackingCompleted(!isTrackingCompleted);
     setIsStopWatchRunning(!isStopWatchRunning);
   };
 
@@ -134,34 +140,41 @@ const TrackingScreen = ({ route, navigation }) => {
     const lastDistance = getPathLength(lastUserCoordinates);
     setIsStopWatchRunning(!isStopWatchRunning);
     endTracking();
-    if (routeDetail) {
-      SecureStore.getItemAsync("token").then((token) => {
-        startedRoutesService
-          .completeTracking(
-            {
-              id: startedRouteId,
-              userCoordinates: lastUserCoordinates,
-              distance: lastDistance,
-              duration: time,
-            },
-            token
-          )
-          .then((res) => {
-            // Go to Route Completed Screen
-            console.log("Data " , res.data)
-            console.log("Koords " , res.data.completedRoute.userCoordinates)
-            if (res.status == 200)
-              navigation.dispatch(
-                StackActions.replace("CompletedRoute", {
-                  routeDetail: routeDetail,
-                  completedRoute: res.data.completedRoute,
-                })
-              );
-          });
-      });
-    } else {
-      // Eğer doğaçlama yürüyorsa kaydetme sayfasına yönlendir.
-    }
+
+    SecureStore.getItemAsync("token").then((token) => {
+      startedRoutesService
+        .completeTracking(
+          {
+            id: startedRouteId,
+            userCoordinates: lastUserCoordinates,
+            distance: lastDistance,
+            duration: time,
+          },
+          token
+        )
+        .then((res) => {
+          console.log("Data ", res.data);
+          console.log("Koords ", res.data.completedRoute.userCoordinates);
+          if (res.status == 200 && routeDetail) {
+             // Go to Route Completed Screen
+            navigation.dispatch(
+              StackActions.replace("CompletedRoute", {
+                routeDetail: routeDetail,
+                completedRoute: res.data.completedRoute,
+              })
+            );
+          } if (res.status == 200 && !routeDetail) {
+            // Eğer doğaçlama yürüyorsa kaydetme sayfasına yönlendir.
+            navigation.dispatch(
+              StackActions.replace("CreateRoute", {
+                routeCoordinates: lastUserCoordinates,
+                distance: lastDistance,
+                time: time
+              })
+            );
+          }
+        });
+    });
   };
 
   const closeModal = () => {
@@ -242,7 +255,11 @@ const TrackingScreen = ({ route, navigation }) => {
                 </ScrollView>
                 <View className="px-4 py-1">
                   <Text className="font-semibold text-2xl text-body">
-                  {point.title}<Text className="font-semibold text-xl text-body"> ({point.pointType})</Text>
+                    {point.title}
+                    <Text className="font-semibold text-xl text-body">
+                      {" "}
+                      ({point.pointType})
+                    </Text>
                   </Text>
                   <Text className="font-regular text-base text-body mb-1 line-clamp-2">
                     {point.description}
@@ -280,7 +297,7 @@ const TrackingScreen = ({ route, navigation }) => {
         )}
       </MapView>
 
-      {!routeDetail && (
+      {routeDetail && (
         <TouchableOpacity
           className="absolute bottom-1/4 left-4 px-4 py-3 rounded-full bg-background z-10"
           onPress={() => setModalVisible(true)}
@@ -351,7 +368,7 @@ const TrackingScreen = ({ route, navigation }) => {
       </View>
 
       <AddPointModal
-        routeId={routeDetail._id}
+        routeId={routeDetail?._id}
         isOpen={modalVisible}
         closeModal={closeModal}
         returnPoint={returnAddedPointsFromModal}

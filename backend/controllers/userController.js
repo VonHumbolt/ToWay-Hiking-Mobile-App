@@ -233,6 +233,17 @@ const getUserCreatedRoutes = async (req, res) => {
   }
 }
 
+const updateProfileImage = async (req, res) => {
+  const {userId} = req.body
+  try {
+    await User.findByIdAndUpdate({_id: userId}, {profilePicture: req.files[0].path})
+    res.status(200).json({isUpdated: true})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json(error)
+  }
+}
+
 module.exports = {
   createAccount,
   addCreatedRoute,
@@ -244,5 +255,6 @@ module.exports = {
   getUserSavedRoutes,
   searchUserByName,
   getUserCompletedRoutes,
-  getUserCreatedRoutes
+  getUserCreatedRoutes,
+  updateProfileImage,
 };

@@ -11,6 +11,7 @@ const userRoutes = require("./routes/user")
 const routeRoutes = require("./routes/route")
 const startedRoutes = require("./routes/startedRoutes")
 const comment = require("./routes/comment")
+const country = require("./routes/country")
 
 app.use(express.json())
 app.use(cors())
@@ -19,6 +20,7 @@ app.use("/api/user/", userRoutes)
 app.use("/api/route/", routeRoutes)
 app.use("/api/startedRoutes/", startedRoutes)
 app.use("/api/comment/", comment)
+app.use("/api/country/", country)
 
 mongoose.connect(process.env.MONGO_URL)
     .then(() => {

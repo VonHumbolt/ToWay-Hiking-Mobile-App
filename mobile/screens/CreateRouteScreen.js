@@ -24,14 +24,15 @@ import {
   faPersonBiking,
   faPersonHiking,
   faPersonRunning,
-  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import SelectDropdown from "react-native-select-dropdown";
 import RouteService from "../services/RouteService";
 import GeoNameService from "../services/GeoNameService";
+import { StackActions } from "@react-navigation/native";
+import CountryService from "../services/CountryService";
 
 const CreateRouteScreen = ({ route, navigation }) => {
-  const { routeCoordinates, distance } = route.params;
+  const { routeCoordinates, distance, time } = route.params;
   const [userId, setUserId] = useState("");
   const [startingPointCoordinate, setStartingPointCoordinate] = useState({});
   const [endPointCoordinate, setEndPointCoordinate] = useState({});
@@ -41,11 +42,14 @@ const CreateRouteScreen = ({ route, navigation }) => {
   const [categories, setCategories] = useState(["Hiking"]);
   const [imageFilesForUpload, setImageFilesForUpload] = useState([]);
   const [counrtyName, setCounrtyName] = useState("");
+  const [cityName, setCityName] = useState("");
   const [difficultyLevel, setDifficultyLevel] = useState("Beginner");
+  const [cities, setCities] = useState([])
   const mapRef = useRef();
 
   const routeService = new RouteService();
   const geoNameService = new GeoNameService();
+  const countryService = new CountryService()
 
   useEffect(() => {
     setStartingPointCoordinate(routeCoordinates[0]);
@@ -63,16 +67,26 @@ const CreateRouteScreen = ({ route, navigation }) => {
     geoNameService
       .getCountryFromCoordinate(latitude, longitude)
       .then((res) => {
-        if (res.status == 200) setCounrtyName(res.data.countryName);
+        if (res.status == 200) {
+          setCounrtyName(res.data.countryName);
+          getCitiesByCountryName(res.data.countryName)
+        }
       })
       .catch((err) => console.log(err));
   };
 
+  const getCitiesByCountryName = (countryName) => {
+    countryService.getCitiesByCountryName(countryName).then(res => {
+      if (res.status == 200)
+        setCities(res.data.cities)
+    })
+  } 
+
   const calculateAverageSpeed = () => {
     const km = distance / 1000;
-    const hour = distance / 5000;
+    const hour = time / (1000 * 60 * 60);
 
-    return Math.round(km / hour);
+    return hour == 0 ? 0 : Math.round(km / hour);
   };
 
   const pickImage = async () => {
@@ -135,15 +149,14 @@ const CreateRouteScreen = ({ route, navigation }) => {
     formData.append("ownerId", userId);
     formData.append("title", data.title);
     formData.append("description", data.description);
-    formData.append("duration", Math.round((distance * 60) / 5000));
+    formData.append("duration", time);
     formData.append("distance", distance);
     formData.append("country", counrtyName);
-    formData.append("city", data.city);
+    formData.append("city", cityName);
     formData.append("level", difficultyLevel);
     formData.append("categories", JSON.stringify(categories));
     formData.append("coordinates", JSON.stringify(routeCoordinates));
     formData.append("isPublic", isPublic);
-    // formData.append("importantPoints", JSON.stringify()) düzelt!
 
     for (let i = 0; i < imageFilesForUpload.length; i++) {
       formData.append("images[]", imageFilesForUpload[i]);
@@ -153,8 +166,9 @@ const CreateRouteScreen = ({ route, navigation }) => {
       routeService
         .createRoute(formData, token)
         .then((res) => {
-          if(res.status == 200)
-            navigation.navigate("RouteDetail", { routeDetail: res.data })
+          if(res.status == 200) {
+            navigation.dispatch(StackActions.replace("RouteDetail", { routeDetail: res.data }))
+          }
         })
         .catch((err) => console.log(err.message));
     })
@@ -213,7 +227,7 @@ const CreateRouteScreen = ({ route, navigation }) => {
               </Marker>
               <Polyline
                 coordinates={routeCoordinates}
-                strokeColor="#103B5F"
+                strokeColor="#E16308"
                 strokeWidth={8}
                 lineJoin="bevel"
               />
@@ -231,7 +245,7 @@ const CreateRouteScreen = ({ route, navigation }) => {
               <Text className="font-regular text-lg text-body">Time </Text>
               <Text className="font-semibold text-primary text-xl">
                 {" "}
-                {convertMinuteToHour((distance * 60) / 5000)}
+                {convertMinuteToHour(Math.floor((time / (1000 * 60)) % 60))}
               </Text>
             </View>
             <View className="flex-row items-center justify-between px-4 pb-3">
@@ -424,7 +438,7 @@ const CreateRouteScreen = ({ route, navigation }) => {
           }}
           renderButton={(selectedItem, isOpened) => {
             return (
-              <TouchableOpacity className="flex-row items-center gap-2 mt-3 px-5 py-3 bg-[#E7E7E7] rounded-full">
+              <TouchableOpacity className="flex-row items-center gap-2 mt-1 px-5 py-4 bg-[#E7E7E7] rounded-full">
                 <Text className="flex-grow font-regular text-[#919191]">
                   {(selectedItem && selectedItem) || "Beginner"}
                 </Text>
@@ -491,40 +505,49 @@ const CreateRouteScreen = ({ route, navigation }) => {
         <Text className="text-xl font-semibold text-body mt-6 mb-3">
           Add city
         </Text>
-        <Controller
-          name="city"
-          control={control}
-          rules={{ required: true }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="In which city is this route located?"
-              autoCapitalize="words"
-              clearButtonMode="always"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              className="px-4 py-4 border border-secondary rounded-3xl font-regular focus:border-primary focus:border-4"
-            />
-          )}
-        />
-        {errors.city && (
-          <Text className="font-regular px-2 pt-2 text-secondaryDark">
-            This field is required.
-          </Text>
-        )}
-
-        <Text className="text-xl font-semibold text-body mt-6 mb-3">
-          Add highlights
-        </Text>
-        <View className="flex-row items-center gap-2">
-          <TextInput
-            placeholder="Highlight - 1"
-            autoCapitalize="words"
-            clearButtonMode="always"
-            className="flex-grow px-4 py-4 border border-secondary rounded-3xl font-regular focus:border-primary focus:border-4"
+        <SelectDropdown
+            data={cities}
+            onSelect={(selectedItem, index) => {
+              setCityName(selectedItem)
+            }}
+            renderButton={(selectedItem, isOpened) => {
+              return (
+                <TouchableOpacity className="flex-row items-center justify-between px-5 py-4 bg-[#E7E7E7] rounded-full">
+                  <Text className="font-regular text-[#919191]">
+                    {(selectedItem && selectedItem) || "Select City"}
+                  </Text>
+                  <FontAwesomeIcon
+                    icon={faChevronDown}
+                    size={12}
+                    color="#B5B5B5"
+                  />
+                </TouchableOpacity>
+              );
+            }}
+            renderItem={(item, index, isSelected) => {
+              return (
+                <View className="px-5 py-2">
+                  <Text className="font-regular text-lg">
+                    {isSelected ? (
+                      <Text>
+                        {" "}
+                        {item} <FontAwesomeIcon icon={faCheck} size={12} />{" "}
+                      </Text>
+                    ) : (
+                      item
+                    )}
+                  </Text>
+                </View>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+            dropdownStyle={{
+              borderRadius: 6,
+              height: 250,
+              paddingVertical: 8,
+              paddingHorizontal: 2,
+            }}
           />
-          <FontAwesomeIcon icon={faTrashCan} size={22} color="#919191" />
-        </View>
 
         <View className="flex-row items-center gap-2 mt-2">
           <Text className="text-xl font-semibold text-body mt-6 mb-3">
@@ -585,6 +608,14 @@ const CreateRouteScreen = ({ route, navigation }) => {
         >
           <Text className="text-white font-semibold text-lg text-center">
             Complete
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="py-3 px-8 rounded-full border border-secondaryDark mt-2"
+          onPress={() => navigation.dispatch(StackActions.replace("TabNavigation"))}
+        >
+          <Text className="text-secondaryDark font-semibold text-lg text-center">
+            Cancel
           </Text>
         </TouchableOpacity>
       </ScrollView>

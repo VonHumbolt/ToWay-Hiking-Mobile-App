@@ -2,7 +2,6 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faGaugeSimpleHigh,
   faBookmark as faBookmarkSolid,
 } from "@fortawesome/free-solid-svg-icons";
 import convertMinuteToHour from "../utils/convertMinuteToHour";
@@ -132,7 +131,10 @@ const RouteCard = ({ route }) => {
           </Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <FontAwesomeIcon icon={faGaugeSimpleHigh} size={20} color="#101010" />
+          <Image
+            source={require("../assets/icons/detail_speed_icon.png")}
+            className="w-7 h-7"
+          />
           <Text className="font-regular text-base">{averageSpeed()} km/h</Text>
         </View>
       </View>

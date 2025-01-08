@@ -5,7 +5,6 @@ import {
   ScrollView,
   Image,
   KeyboardAvoidingView,
-  Pressable,
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
@@ -20,9 +19,11 @@ const RouteCompletedScreen = ({ route, navigation }) => {
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(true);
 
   const calculateAverageSpeed = () => {
-    // const km = completedRoute?.distance / 1000;
-    // const hour = distance / 5000;
-    // return Math.round(km / hour);
+    console.log(completedRoute)
+    const km = completedRoute?.distance / 1000;
+    const hour = completedRoute?.duration / (1000 * 60 * 60);
+
+    return km == 0 ? 0 : Math.round(km / hour);
   };
 
   return (
@@ -118,7 +119,7 @@ const RouteCompletedScreen = ({ route, navigation }) => {
                   Velocity{" "}
                 </Text>
                 <Text className="font-semibold text-primary text-xl">
-                  {12} km/h
+                  {calculateAverageSpeed()} km/h
                 </Text>
               </View>
             </View>

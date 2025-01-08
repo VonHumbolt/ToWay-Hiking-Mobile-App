@@ -7,14 +7,32 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import AuthService from "../services/AuthService";
 import { StackActions } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import SelectDropdown from "react-native-select-dropdown";
+import CountryService from "../services/CountryService";
 
 const CreateAccountScreen = ({ navigation }) => {
   const authService = new AuthService();
+  const countryService = new CountryService()
+
+  const [countries, setCountries] = useState([])
+  const [cities, setCities] = useState([])
+  const [countryName, setCountryName] = useState("")
+  const [cityName, setCityName] = useState("")
+
+  useEffect(() => {
+    getAllCountries()
+  }, [])
+  
+  const getAllCountries = () => {
+    countryService.getallCountries().then(res => setCountries(res.data))
+  }
 
   const {
     control,
@@ -23,6 +41,8 @@ const CreateAccountScreen = ({ navigation }) => {
   } = useForm({});
 
   const onSubmit = (data) => {
+    data.country = countryName
+    data.city = cityName
     authService
       .register(data)
       .then((res) => {
@@ -51,7 +71,7 @@ const CreateAccountScreen = ({ navigation }) => {
             </Text>
             <Text className="mt-1 font-regular text-lg text-body">
               Already have an account?{" "}
-              <Text className="font-semibold text-primary">Sign in</Text>
+              <Text className="font-semibold text-primary" onPress={() => navigation.navigate("SignIn")}>Sign in</Text>
             </Text>
             <Controller
               name="fullName"
@@ -74,48 +94,94 @@ const CreateAccountScreen = ({ navigation }) => {
                 This field is required.
               </Text>
             )}
-            <Controller
-              name="country"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Country"
-                  clearButtonMode="always"
-                  autoCapitalize="words"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  className="mt-5 px-3 py-4 border border-secondary rounded-2xl font-regular focus:border-primary focus:border-4"
-                />
-              )}
+            <SelectDropdown
+              data={countries}
+              onSelect={(selectedItem, index) => {
+                setCountryName(selectedItem.name)
+                setCities(selectedItem.cities)
+              }}
+              renderButton={(selectedItem, isOpened) => {
+                return (
+                  <TouchableOpacity className="flex-row items-center justify-between rounded-2xl mt-5 px-3 py-4 border border-secondary font-regular focus:border-primary focus:border-4">
+                    <Text className="font-regular text-[#919191]">
+                      {(selectedItem && <Text className="font-regular text-body">{selectedItem.name}</Text>) || "Country"}
+                    </Text>
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      size={12}
+                      color="#B5B5B5"
+                    />
+                  </TouchableOpacity>
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View className="px-5 py-2">
+                    <Text className="font-regular text-lg">
+                      {isSelected ? (
+                        <Text>
+                          {" "}
+                          {item.name} <FontAwesomeIcon icon={faCheck} size={12} />{" "}
+                        </Text>
+                      ) : (
+                        item.name
+                      )}
+                    </Text>
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={{
+                borderRadius: 6,
+                height: 250,
+                paddingVertical: 8,
+                paddingHorizontal: 2,
+              }}
             />
-            {errors.country && (
-              <Text className="font-regular px-2 pt-2 text-secondary">
-                This field is required.
-              </Text>
-            )}
-            <Controller
-              name="city"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="City"
-                  clearButtonMode="always"
-                  autoCapitalize="words"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  className="mt-5 px-3 py-4 border border-secondary rounded-2xl font-regular focus:border-primary focus:border-4"
-                />
-              )}
+            
+            <SelectDropdown
+              data={cities}
+              onSelect={(selectedItem, index) => {
+                setCityName(selectedItem)
+              }}
+              renderButton={(selectedItem, isOpened) => {
+                return (
+                  <TouchableOpacity className="flex-row items-center justify-between rounded-2xl mt-5 px-3 py-4 border border-secondary font-regular focus:border-primary focus:border-4">
+                    <Text className="font-regular text-[#919191]">
+                      {(selectedItem && <Text className="font-regular text-body">{selectedItem}</Text>) || "City"}
+                    </Text>
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      size={12}
+                      color="#B5B5B5"
+                    />
+                  </TouchableOpacity>
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View className="px-5 py-2">
+                    <Text className="font-regular text-lg">
+                      {isSelected ? (
+                        <Text>
+                          {" "}
+                          {item} <FontAwesomeIcon icon={faCheck} size={12} />{" "}
+                        </Text>
+                      ) : (
+                        item
+                      )}
+                    </Text>
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={{
+                borderRadius: 6,
+                height: 250,
+                paddingVertical: 8,
+                paddingHorizontal: 2,
+              }}
             />
-            {errors.city && (
-              <Text className="font-regular px-2 pt-2 text-secondary">
-                This field is required.
-              </Text>
-            )}
             <Controller
               name="email"
               control={control}

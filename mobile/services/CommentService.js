@@ -12,4 +12,37 @@ export default class CommentService {
       },
     });
   }
+
+  getCommentsByRouteId(routeId, token) {
+    return axios.get(this.apiUrl + "getCommentsByRouteId/" + routeId, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  }
+
+  getCommentsThatIncludesImage(routeId, token) {
+    return axios.get(this.apiUrl + "getIllustratedComments/" + routeId, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  }
+ 
+  numberOfComments(routeId, token) {
+    return axios.get(this.apiUrl + "numberOfComments/" + routeId, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  }
+  
+  numberOfIllustratedComments(routeId, token) {
+    return axios.get(this.apiUrl + "numberOfIllustratedComments/" + routeId, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  }
+
 }

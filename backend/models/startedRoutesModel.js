@@ -12,7 +12,6 @@ const startedRoutesSchema = new Schema({
     },
     routeId: {
         type: String,
-        required: true
     },
     userCoordinates: {
         type: Object

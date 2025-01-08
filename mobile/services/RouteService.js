@@ -33,4 +33,8 @@ export default class RouteService {
   getPopularRoutes() {
     return axios.get(this.apiUrl + "getRoutesByNumberOfCompletions")
   }
+
+  getRouteById(routeId) {
+    return axios.get(this.apiUrl + "getRouteById/" + routeId);
+  }
 }

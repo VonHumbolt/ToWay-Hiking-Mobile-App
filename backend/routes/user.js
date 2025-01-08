@@ -1,7 +1,8 @@
 const express  = require("express")
 
-const {createAccount, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes, login, getUserSavedRoutes, searchUserByName, getUserCompletedRoutes, getUserCreatedRoutes} = require("../controllers/userController")
+const {createAccount, getUserById, saveRouteForUser, removeRouteFromUserSavedRoutes, isRouteInUserSavedRoutes, login, getUserSavedRoutes, searchUserByName, getUserCompletedRoutes, getUserCreatedRoutes, updateProfileImage} = require("../controllers/userController")
 const requireAuth = require("../middleware/requireAuth")
+const { upload } = require("../middleware/uploadImage")
 
 const router = express.Router()
 
@@ -24,5 +25,7 @@ router.use(requireAuth).get("/getSavedRoutes/:userId", getUserSavedRoutes)
 router.use(requireAuth).get("/getCompletedRoutes/:userId", getUserCompletedRoutes)
 
 router.use(requireAuth).get("/getCreatedRoutes/:ownerId/:profileId", getUserCreatedRoutes)
+
+router.use(requireAuth).use(upload).post("/updateProfileImage", updateProfileImage)
 
 module.exports = router

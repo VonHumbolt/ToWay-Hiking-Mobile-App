@@ -28,4 +28,12 @@ export default class StartedRoutesService {
             }
         })
     }
+
+    isUserHasActiveRoute(userId, token) {
+        return axios.get(this.apiUrl + "isUserHasActiveRoute/" + userId, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+    }
 }

@@ -14,7 +14,6 @@ const createRoute = async (req, res) => {
     categories,
     coordinates,
     isPublic,
-    importantPoints,
   } = req.body;
 
   const parsedCategories = JSON.parse(categories);
@@ -39,7 +38,6 @@ const createRoute = async (req, res) => {
       coordinates: parsedCoordinates,
       isPublic,
       images: routeImages,
-      // importantPoints,
     });
     console.log("Route -> ", route);
     if (route.ownerId) addCreatedRoute(route);
@@ -86,7 +84,7 @@ const addImportantPointsToRoute = async (req, res) => {
 const getFiveRoutesWithCityName = async (req, res) => {
   const { cityName } = req.params;
   try {
-    const routes = await Route.find({ city: cityName, isPublic: true }).limit(
+    const routes = await Route.find({ city: cityName, isPublic: true }).select('-comments').limit(
       5
     );
     res.status(200).json(routes);
@@ -101,7 +99,7 @@ const searchRoutesByCityName = async (req, res) => {
   try {
     const routes = await Route.find({
       city: { $regex: cityName, $options: "i" },
-    }).limit(5);
+    }).select('-comments').limit(5);
     res.status(200).json(routes);
   } catch (error) {
     console.log(error);
@@ -113,6 +111,7 @@ const getRoutesByNumberOfCompletions = async (req, res) => {
   try {
     const routes = await Route.find({})
       .sort({ numberOfCompletions: "descending" })
+      .select('-comments')
       .limit(5);
     res.status(200).json(routes);
   } catch (error) {
@@ -121,10 +120,23 @@ const getRoutesByNumberOfCompletions = async (req, res) => {
   }
 };
 
+const getRouteById = async (req, res) => {
+  const {routeId} = req.params
+  try {
+    const route = await Route.findById({_id: routeId}).select('-comments')
+    console.log(route)
+    res.status(200).json(route);
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({error: error.message})
+  }
+}
+
 module.exports = {
   createRoute,
   addImportantPointsToRoute,
   getFiveRoutesWithCityName,
   searchRoutesByCityName,
   getRoutesByNumberOfCompletions,
+  getRouteById,
 };

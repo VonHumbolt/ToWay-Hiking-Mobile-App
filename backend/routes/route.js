@@ -1,10 +1,12 @@
 const express  = require("express")
 
-const {createRoute, getFiveRoutesWithCityName, addImportantPointsToRoute, searchRoutesByCityName, getRoutesByNumberOfCompletions} = require("../controllers/routeController")
+const {createRoute, getFiveRoutesWithCityName, addImportantPointsToRoute, searchRoutesByCityName, getRoutesByNumberOfCompletions, getRouteById} = require("../controllers/routeController")
 const { upload } = require("../middleware/uploadImage")
 const requireAuth = require("../middleware/requireAuth")
 
 const router = express.Router()
+
+router.get("/getRouteById/:routeId", getRouteById)
 
 router.get("/getFiveRoutesWithCityName/:cityName", getFiveRoutesWithCityName)
 

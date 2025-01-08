@@ -59,21 +59,36 @@ const completeTracking = async (req, res) => {
         isCompleted: true,
       }
     );
-    await Route.findByIdAndUpdate(
-      { _id: completedRoute.routeId },
-      { $inc: { numberOfCompletions: 1 } }
-    );
-    await User.findByIdAndUpdate(
-      { _id: completedRoute.userId },
-      {
-        $inc: {
-          totalNumberOfCompletedRoutes: 1,
-          totalDistance: distance,
-          totalElapsedTime: duration,
-        },
-        $push: { completedRoutes: completedRoute.routeId }
-      }
-    );
+    if(completedRoute.routeId) {
+      // If user walks a route which is created.
+      await Route.findByIdAndUpdate(
+        { _id: completedRoute.routeId },
+        { $inc: { numberOfCompletions: 1 } }
+      );
+      await User.findByIdAndUpdate(
+        { _id: completedRoute.userId },
+        {
+          $inc: {
+            totalNumberOfCompletedRoutes: 1,
+            totalDistance: distance,
+            totalElapsedTime: duration,
+          },
+          $push: { completedRoutes: completedRoute.routeId }
+        }
+      );
+    } else {
+      // If user walk without route
+      await User.findByIdAndUpdate(
+        { _id: completedRoute.userId },
+        {
+          $inc: {
+            totalNumberOfCompletedRoutes: 1,
+            totalDistance: distance,
+            totalElapsedTime: duration,
+          }
+        }
+      );
+    }
     console.log(completedRoute);
     res.status(200).json({
       completedRoute: completedRoute,
@@ -84,4 +99,16 @@ const completeTracking = async (req, res) => {
   }
 };
 
-module.exports = { startTracking, updateTracking, completeTracking };
+const isUserHasActiveTracking = async (req, res) => {
+  const {userId} = req.params
+  try {
+    const activeRoute = await StartedRoutes.findOne({userId: userId, isRouteActive: true})
+    console.log("Active route ", activeRoute)
+    res.status(200).json(activeRoute)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({error: error.message})
+  }
+}
+
+module.exports = { startTracking, updateTracking, completeTracking, isUserHasActiveTracking };

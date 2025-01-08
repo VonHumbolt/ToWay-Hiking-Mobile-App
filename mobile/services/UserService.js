@@ -80,4 +80,16 @@ export default class UserService {
   searchUsersByName(name) {
     return axios.get(this.apiUrl + "searchUserByName/" + name)
   }
+
+  updateProfileImage(formData, token) {
+    return axios.post(
+      this.apiUrl + "updateProfileImage",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  } 
 }
