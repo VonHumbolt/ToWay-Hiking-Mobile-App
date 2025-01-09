@@ -14,7 +14,7 @@ import {
   faBookmark,
   faCircleQuestion,
 } from "@fortawesome/free-regular-svg-icons";
-import { faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faRotateLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { getPathLength } from "geolib";
 import StartedRoutesService from "../services/StartedRoutesService";
@@ -74,6 +74,11 @@ const MapScreen = ({ navigation }) => {
     setRouteCoordinates(newCoords);
   };
 
+  const clearAllDrawing = () => {
+    setIsStartingPointSelected(false)
+    setRouteCoordinates([])
+  }
+
    const startTrackingTheRoute = () => {
       SecureStore.getItemAsync("token").then((token) => {
         SecureStore.getItemAsync("userId").then((userId) => {
@@ -127,6 +132,7 @@ const MapScreen = ({ navigation }) => {
             </Text>
 
             <TouchableOpacity className="flex flex-row justify-center items-center gap-2 py-3 px-8 rounded-3xl bg-primary"
+            disabled={routeCoordinates.length == 0}
               onPress={() => navigation.navigate("CreateRoute", { routeCoordinates: routeCoordinates, distance: routeLength, time:0 })}>
               <FontAwesomeIcon icon={faBookmark} size={18} color="white" />
               <Text className="text-white font-semibold text-lg">Save</Text>
@@ -134,12 +140,22 @@ const MapScreen = ({ navigation }) => {
           </View>
         </View>
 
+        {/* Undo Draw Button */}
         {isStartingPointSelected && (
           <TouchableOpacity
             className="absolute top-64 right-4 p-4 bg-secondaryDark rounded-full"
             onPress={takeBackToDrawing}
           >
             <FontAwesomeIcon icon={faRotateLeft} size={20} color="white" />
+          </TouchableOpacity>
+        )}
+
+        {isStartingPointSelected && (
+          <TouchableOpacity
+            className="absolute top-80 right-4 p-4 bg-secondaryDark rounded-full"
+            onPress={clearAllDrawing}
+          >
+            <FontAwesomeIcon icon={faTrash} size={20} color="white" />
           </TouchableOpacity>
         )}
 
