@@ -41,7 +41,7 @@ const HomeScreen = ({navigation}) => {
   }, [isScreenFocused]);
 
   const searchRoutesByCityName = async (searchInput) => {
-    routeService.searchRoutesByCityName(searchInput).then((res) => {
+    routeService.searchRoutesByTitle(searchInput).then((res) => {
       console.log(res.data);
       if (res.status == 200) setSearchedRoutes(res.data);
     });
@@ -162,7 +162,9 @@ const HomeScreen = ({navigation}) => {
             </View>
           )}
         </View>
-
+        <TouchableOpacity onPress={requestPermissions}>
+    <Text>Enable background location</Text>
+  </TouchableOpacity>
         {/* Popular Routes */}
         <PopularRoutes />
 

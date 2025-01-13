@@ -140,6 +140,8 @@ const TrackingScreen = ({ route, navigation }) => {
     const lastDistance = getPathLength(lastUserCoordinates);
     setIsStopWatchRunning(!isStopWatchRunning);
     endTracking();
+    setUserCoordinates([])
+    updateUserCoordinates([])
 
     SecureStore.getItemAsync("token").then((token) => {
       startedRoutesService

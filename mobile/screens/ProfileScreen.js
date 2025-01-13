@@ -87,7 +87,7 @@ const ProfileScreen = ({ route, navigation }) => {
     const type = match ? `image/${match[1]}` : `image`;
 
     setProfileImage(image.uri);
-    // setImageFile({ uri: image.uri, name: filename, type });
+
     // update user profile picture
     const formData = new FormData();
     formData.append("userId", userId);
@@ -186,13 +186,13 @@ const ProfileScreen = ({ route, navigation }) => {
           <View className="items-center">
             <Text className="font-semibold text-lg text-primary">Distance</Text>
             <Text className="font-regular text-2xl text-body mt-3">
-              {user?.totalDistance}
+              {user?.totalDistance} <Text className="text-sm text-body">m</Text>
             </Text>
           </View>
           <View className="items-center">
             <Text className="font-semibold text-lg text-primary">Time</Text>
             <Text className="font-regular text-2xl text-body mt-3">
-              {Math.floor((user?.totalElapsedTime / (1000 * 60)) % 60)}
+              {Math.floor((user?.totalElapsedTime / (1000 * 60)) % 60)} <Text className="text-sm text-body">min</Text>
             </Text>
           </View>
         </View>

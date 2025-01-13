@@ -26,8 +26,8 @@ export default class RouteService {
     });
   }
 
-  searchRoutesByCityName(cityName) {
-    return axios.get(this.apiUrl + "searchRoutesByCity/" + cityName)
+  searchRoutesByTitle(title) {
+    return axios.get(this.apiUrl + "searchRoutesByName/" + title)
   }
   
   getPopularRoutes() {

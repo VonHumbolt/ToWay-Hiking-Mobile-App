@@ -70,3 +70,51 @@ In addition, when the user starts to tracking, tracking time, distance and user 
 
 ## How can I use this project?
 
+1. Clone or Download as zip folder of this repository
+
+        git clone https://github.com/VonHumbolt/ToWay-Hiking-Mobile-App.git
+
+2. You need the Cloudinary api key to store the images. Then, go to /backend/.env file and add your cloudinary configs.
+   (Note: cloudinary.com after you go to the website and create an account, you can create an api for free!)
+
+        CLOUD_NAME=*******
+        API_KEY=********
+        API_SECRET=*********
+
+3. Go to /mobile/.env file and replace <YOUR_LOCALHOST_IP> with your wireless LAN adapter Wi-fi IPv4 Address.
+
+        API_URL=http://<YOUR_LOCALHOST_IP>:5000/api/
+
+4. I used GeoNames Service for getting the country where user is currently located. For this, you can go to www.geonames.org website and you can create an free account. After this, paste your username in the /mobile/.env file. (Note: I used this service only in create route screen for adding new route. Therefore, if you are not going to add a new route, this service is not required to use this application.)
+        
+        GEONAME_USERNAME=******
+
+5. Open cmd in the project root. And, run docker compose file to running MongoDB with following command:
+
+        docker compose up -d
+
+6. For backend, go to /backend directory on cmd. Then, install dependencies and run the backend server with following commands:
+
+        npm install
+        npm run dev
+
+7. For the mobile app, go to /mobile path in cmd. If you haven't installed expo before, you can install expo using the following command in cmd:
+
+        npm install -g expo-cli
+
+8. Then, run this command to create node_modules and start the mobile app by running the following command on the same path.
+
+        npm install
+        npx expo start
+
+11. To open the mobile app in your physical device, use <strong>Expo Go</strong> app. 
+You can download it via the Play Store or App Store.
+
+12. After you installed Expo Go. Open your QR Scanner and scan the QR Code which appears on the screen after running the nxp expo start command.
+
+13. The ports of the project are in the below.
+
+        Backend server is running on localhost:5000
+        MongoDB is running on localhost:27017
+        MongoServer is running on localhost:8091
+

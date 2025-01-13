@@ -94,11 +94,11 @@ const getFiveRoutesWithCityName = async (req, res) => {
   }
 };
 
-const searchRoutesByCityName = async (req, res) => {
-  const { cityName } = req.params;
+const searchRoutesByName = async (req, res) => {
+  const { name } = req.params;
   try {
     const routes = await Route.find({
-      city: { $regex: cityName, $options: "i" },
+      title: { $regex: name, $options: "i" },
     }).select('-comments').limit(5);
     res.status(200).json(routes);
   } catch (error) {
@@ -136,7 +136,7 @@ module.exports = {
   createRoute,
   addImportantPointsToRoute,
   getFiveRoutesWithCityName,
-  searchRoutesByCityName,
+  searchRoutesByName,
   getRoutesByNumberOfCompletions,
   getRouteById,
 };
