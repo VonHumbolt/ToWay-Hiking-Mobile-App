@@ -162,9 +162,7 @@ const HomeScreen = ({navigation}) => {
             </View>
           )}
         </View>
-        <TouchableOpacity onPress={requestPermissions}>
-    <Text>Enable background location</Text>
-  </TouchableOpacity>
+        
         {/* Popular Routes */}
         <PopularRoutes />
 
