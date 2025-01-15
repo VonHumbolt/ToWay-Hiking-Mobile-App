@@ -9,7 +9,7 @@ import {
   faBookmark as faBookmarkSolid,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import convertMinuteToHour from "../utils/convertMinuteToHour";
+import convertMinuteToHour from "../utils/convertMilisecondToMinute";
 import getPastTimeFromDate from "../utils/getPastTimeFromDate";
 import MapView, { Callout, Marker, Polyline } from "react-native-maps";
 import StartedRoutesService from "../services/StartedRoutesService";
@@ -77,6 +77,14 @@ const RouteDetailComponent = ({ routeDetail, goToComments }) => {
         return "bg-[#4B0404]";
     }
   }
+
+  const averageSpeed = () => {
+    const km = routeDetail?.distance / 1000;
+    const min = routeDetail?.duration * 0.00001666666666667
+    const hour = min * 0.01666666666667
+
+    return hour == 0 ? 0 : Math.round((km / hour) * 10) / 10;
+  };
 
   const saveRoute = () => {
     SecureStore.getItemAsync("token").then((token) => {
@@ -196,7 +204,7 @@ const RouteDetailComponent = ({ routeDetail, goToComments }) => {
             source={require("../assets/icons/detail_speed_icon.png")}
             className="w-6 h-6"
           />
-          <Text className="font-regular text-base">5 km/h</Text>
+          <Text className="font-regular text-base">{averageSpeed()} km/h</Text>
         </View>
       </View>
 
@@ -285,8 +293,8 @@ const RouteDetailComponent = ({ routeDetail, goToComments }) => {
               routeDetail?.coordinates[
                 Math.round(routeDetail?.coordinates.length / 2)
               ]?.longitude,
-            latitudeDelta: 0.012,
-            longitudeDelta: 0.012,
+            latitudeDelta: 0.08,
+            longitudeDelta: 0.08,
           }}
         >
           {/* Important Points */}

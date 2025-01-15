@@ -47,11 +47,11 @@ const TrackingScreen = ({ route, navigation }) => {
     routeDetail?.importantPoints
   );
   const [isTrackingCompleted, setIsTrackingCompleted] = useState(false);
+  const [isUserOwnRoute, setIsUserOwnRoute] = useState(false)
 
   useEffect(() => {
     setUserCoordinates(coordinatesFromUser);
-    console.log(isTrackingCompleted);
-
+    routeIsUserOwnRoute()
     // If user walk without a route. Focus user location in opening
     if (!routeDetail) {
       zoomToUser();
@@ -68,6 +68,17 @@ const TrackingScreen = ({ route, navigation }) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const routeIsUserOwnRoute = () => {
+    SecureStore.getItemAsync("userId").then(userId => {
+      console.log(userId)
+      console.log(routeDetail?.ownerId)
+      if (userId == routeDetail?.ownerId)
+        setIsUserOwnRoute(true)
+      else 
+        setIsUserOwnRoute(false)
+    })
+  }
 
   const zoomToUser = async () => {
     const location = await Location.getCurrentPositionAsync({});
@@ -95,8 +106,10 @@ const TrackingScreen = ({ route, navigation }) => {
       console.log(newCoordList.length);
       setUserCoordinates([...userCoordinates, coords]);
 
-      const seconds = Math.floor((time / 1000) % 60);
-      const speed = Math.floor((distance / seconds) * 10) / 10;
+      const km = distance / 1000;
+      const min = time * 0.00001666666666667
+      const hour = min * 0.01666666666667
+      const speed = hour == 0 ? 0 : Math.round((km / hour) * 10) / 10;
       updateAverageSpeed(speed);
     }
   }, 6000);
@@ -299,7 +312,7 @@ const TrackingScreen = ({ route, navigation }) => {
         )}
       </MapView>
 
-      {routeDetail && (
+      {routeDetail && isUserOwnRoute && (
         <TouchableOpacity
           className="absolute bottom-1/4 left-4 px-4 py-3 rounded-full bg-background z-10"
           onPress={() => setModalVisible(true)}

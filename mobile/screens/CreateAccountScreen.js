@@ -209,8 +209,7 @@ const CreateAccountScreen = ({ navigation }) => {
               <TextInput
                 defaultValue="+90 |"
                 editable={false}
-                className=" px-3 py-4 border border-r-0 border-secondary rounded-2xl rounded-r-none font-regular
-                group-focus-within:border-primary group-focus-within:border-4"
+                className=" px-3 py-4 border border-r-0 border-secondary rounded-2xl rounded-r-none font-regular"
               />
               <Controller
                 name="phoneNumber"
@@ -225,8 +224,7 @@ const CreateAccountScreen = ({ navigation }) => {
                     onChangeText={onChange}
                     onBlur={onBlur}
                     value={value}
-                    className="flex-grow px-3 py-4 border border-l-0 border-secondary rounded-2xl rounded-l-none font-regular
-                group-focus-within:border-primary group-focus-within:border-4"
+                    className="flex-grow px-3 py-4 border border-l-0 border-secondary rounded-2xl rounded-l-none font-regular"
                   />
                 )}
               />

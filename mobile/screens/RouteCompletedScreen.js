@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
-import convertMinuteToHour from "../utils/convertMinuteToHour";
 import CommentForm from "../components/CommentForm";
 import RouteCompletedModal from "../components/RouteCompletedModal";
+import convertMilisecondToMinute from "../utils/convertMilisecondToMinute";
 
 const RouteCompletedScreen = ({ route, navigation }) => {
   const { routeDetail, completedRoute } = route.params;
@@ -19,7 +19,7 @@ const RouteCompletedScreen = ({ route, navigation }) => {
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(true);
 
   const calculateAverageSpeed = () => {
-    console.log(completedRoute)
+    console.log(completedRoute);
     const km = completedRoute?.distance / 1000;
     const hour = completedRoute?.duration / (1000 * 60 * 60);
 
@@ -109,9 +109,7 @@ const RouteCompletedScreen = ({ route, navigation }) => {
                 <Text className="font-regular text-lg text-body">Time </Text>
                 <Text className="font-semibold text-primary text-xl">
                   {" "}
-                  {convertMinuteToHour(
-                    Math.floor((completedRoute?.duration / (1000 * 60)) % 60)
-                  )}
+                  {convertMilisecondToMinute(completedRoute?.duration)}
                 </Text>
               </View>
               <View className="flex-row items-center justify-between px-4 pb-3">

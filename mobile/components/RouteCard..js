@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faBookmark as faBookmarkSolid,
 } from "@fortawesome/free-solid-svg-icons";
-import convertMinuteToHour from "../utils/convertMinuteToHour";
 import {
   faClock,
   faBookmark as faBookmarkRegular,
@@ -13,6 +12,7 @@ import getPastTimeFromDate from "../utils/getPastTimeFromDate";
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import UserService from "../services/UserService";
+import convertMilisecondToMinute from "../utils/convertMilisecondToMinute";
 
 const RouteCard = ({ route }) => {
   const navigation = useNavigation();
@@ -65,9 +65,10 @@ const RouteCard = ({ route }) => {
 
   const averageSpeed = () => {
     const km = route?.distance / 1000;
-    const hour = route?.duration / 60;
+    const min = route?.duration * 0.00001666666666667
+    const hour = min * 0.01666666666667
 
-    return Math.round((km / hour) * 10) / 10;
+    return hour == 0 ? 0 : Math.round((km / hour) * 10) / 10;
   };
 
   function changeButtonColorWithDifficultyLevel() {
@@ -127,7 +128,7 @@ const RouteCard = ({ route }) => {
             className="w-7 h-7"
           />
           <Text className="font-regular text-base">
-            {convertMinuteToHour(route?.duration)}
+            {convertMilisecondToMinute(route?.duration)}
           </Text>
         </View>
         <View className="flex-row items-center gap-1">

@@ -12,7 +12,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import convertMinuteToHour from "../utils/convertMinuteToHour";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as SecureStore from "expo-secure-store";
@@ -30,6 +29,7 @@ import RouteService from "../services/RouteService";
 import GeoNameService from "../services/GeoNameService";
 import { StackActions } from "@react-navigation/native";
 import CountryService from "../services/CountryService";
+import convertMilisecondToMinute from "../utils/convertMilisecondToMinute";
 
 const CreateRouteScreen = ({ route, navigation }) => {
   const { routeCoordinates, distance, time } = route.params;
@@ -85,9 +85,10 @@ const CreateRouteScreen = ({ route, navigation }) => {
 
   const calculateAverageSpeed = () => {
     const km = distance / 1000;
-    const hour = time / (1000 * 60 * 60);
+    const min = time * 0.00001666666666667
+    const hour = min * 0.01666666666667
 
-    return hour == 0 ? 0 : Math.round(km / hour);
+    return hour == 0 ? 0 : Math.round((km / hour) * 10) / 10;
   };
 
   const pickImage = async () => {
@@ -246,7 +247,7 @@ const CreateRouteScreen = ({ route, navigation }) => {
               <Text className="font-regular text-lg text-body">Time </Text>
               <Text className="font-semibold text-primary text-xl">
                 {" "}
-                {convertMinuteToHour(Math.floor((time / (1000 * 60)) % 60))}
+                {convertMilisecondToMinute(time)}
               </Text>
             </View>
             <View className="flex-row items-center justify-between px-4 pb-3">

@@ -66,7 +66,7 @@ const CommentComponent = ({
   };
 
   return (
-    <View className="">
+    <View className="mb-6">
       <View className="px-6 flex-row items-center gap-4">
         <TouchableOpacity
           className="p-2 rounded-full bg-[#E7E7E7]"
