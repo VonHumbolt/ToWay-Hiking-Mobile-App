@@ -17,6 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faRightFromBracket, faShareNodes } from "@fortawesome/free-solid-svg-icons";
+import convertMilisecondToMinute from "../utils/convertMilisecondToMinute";
 
 const ProfileScreen = ({ route, navigation }) => {
   const { userId } = route.params;
@@ -134,7 +135,7 @@ const ProfileScreen = ({ route, navigation }) => {
             )}
             <Image
               source={{
-                uri: profileImage ? profileImage : user?.profilePicture,
+                uri: (profileImage && isUserOwnProfile) ? profileImage : user?.profilePicture,
               }}
               className="rounded-3xl w-44 h-52"
             />
@@ -192,7 +193,7 @@ const ProfileScreen = ({ route, navigation }) => {
           <View className="items-center">
             <Text className="font-semibold text-lg text-primary">Time</Text>
             <Text className="font-regular text-2xl text-body mt-3">
-              {Math.floor((user?.totalElapsedTime / (1000 * 60)) % 60)} <Text className="text-sm text-body">min</Text>
+              {convertMilisecondToMinute(user?.totalElapsedTime)}
             </Text>
           </View>
         </View>

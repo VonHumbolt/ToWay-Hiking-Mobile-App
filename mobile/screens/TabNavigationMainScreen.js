@@ -5,12 +5,11 @@ import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
 import ProfileScreen from "./ProfileScreen";
 import SavedRouteScreen from "./SavedRouteScreen";
-import * as SecureStore from "expo-secure-store";
 
 const Tab = createBottomTabNavigator();
-const ownId = SecureStore.getItem("userId")
 
-const TabNavigationMainScreen = () => {
+const TabNavigationMainScreen = ({ route }) => {
+  const { userId } = route.params;
   return (
     <Tab.Navigator
       screenOptions={{
@@ -86,7 +85,7 @@ const TabNavigationMainScreen = () => {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        initialParams={{userId: ownId}}
+        initialParams={{userId: userId}}
         options={{
           tabBarIcon: ({ focused }) => (
             focused ? (

@@ -137,9 +137,10 @@ const CreateRouteScreen = ({ route, navigation }) => {
 
   const removeImageFromList = (image) => {
     const newList = routeImages.filter((i) => i != image);
+    const newUpload = imageFilesForUpload.filter((f) => f.uri != image);
     setRouteImages([...newList]);
+    setImageFilesForUpload([...newUpload]);
   };
-
   const {
     control,
     handleSubmit,

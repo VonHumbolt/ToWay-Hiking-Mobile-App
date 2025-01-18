@@ -27,7 +27,7 @@ const SignInScreen = ({ navigation }) => {
       .login(data)
       .then((res) => {
         if (res.status == 200) setUserCredentials(res.data);
-        navigation.dispatch(StackActions.replace("TabNavigation"));
+        navigation.dispatch(StackActions.replace("TabNavigation", {userId: res.data.userId}));
       })
       .catch((error) => console.log(error));
   };

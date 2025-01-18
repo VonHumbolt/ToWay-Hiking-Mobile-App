@@ -66,7 +66,9 @@ const addCreatedRoute = async (route) => {
   try {
     const result = await User.findByIdAndUpdate(
       { _id: route.ownerId },
-      { createdRoutes: route._id }
+      {
+        $push: { createdRoutes: route._id }
+      }
     );
     return result;
   } catch (error) {
@@ -172,7 +174,7 @@ const getUserSavedRoutes = async (req, res) => {
 
 const searchUserByName = async (req, res) => {
   const {name} = req.params
-  // Kullanıcının tüm bilgilerini döndürme !
+
   try {
     const users = await User.find({fullName: {$regex: name, $options: 'i'}}).select("userId fullName profilePicture").limit(5)
     res.status(200).json(users)

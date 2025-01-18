@@ -12,8 +12,10 @@ import CreateRouteScreen from "./screens/CreateRouteScreen";
 import RouteDetailScreen from "./screens/RouteDetailScreen";
 import SignInScreen from "./screens/SignInScreen";
 import RouteCompletedScreen from "./screens/RouteCompletedScreen";
+import * as SecureStore from "expo-secure-store";
 
 const Stack = createNativeStackNavigator();
+const ownId = SecureStore.getItem("userId")
 
 export default function App() {
 
@@ -59,6 +61,7 @@ export default function App() {
           options={{
             headerShown: false
           }}
+          initialParams={{userId: ownId}}
           name="TabNavigation"
           component={TabNavigationMainScreen}
         />
