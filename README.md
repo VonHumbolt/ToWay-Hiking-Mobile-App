@@ -118,3 +118,10 @@ You can download it via the Play Store or App Store.
         MongoDB is running on localhost:27017
         MongoServer is running on localhost:8091
 
+## Trailer of the Project
+
+<div align="center">
+
+https://github.com/user-attachments/assets/5d32f6f4-179e-4c64-bd21-39565aaa2dc8
+    
+</div>
